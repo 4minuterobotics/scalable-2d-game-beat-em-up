@@ -1,0 +1,43 @@
+all sheets{
+    height: 200 px
+    width: 380 px
+    feet distance: 100px
+    image placement: back foot 380x /2 + or - 25 
+}
+
+start sheet{
+    pics: 20
+    width: 7600
+}
+
+idle{
+    pics: 13
+}
+
+bite{
+    pics: 8
+}
+
+swipe{
+    pics: 7
+}
+
+punch{
+    pics: 3
+}
+
+special{
+    pics: 18
+}
+
+crawl{
+    pics: 9
+}
+
+walk{
+    pics: 10
+}
+
+facing right foot placement for left foot{
+    1st: 
+}
