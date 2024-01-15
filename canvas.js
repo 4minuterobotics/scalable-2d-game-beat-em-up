@@ -52,9 +52,9 @@ let bgHeight = 600 * 1.5;
 //background tank values
 let bgTankWidth = tank1Image.width * 3;
 let bgTankHeight = tank1Image.height * 3;
-let bgTank1Distance = 1000;
-let bgTank2Distance = 800;
-let bgTank3Distance = 1500;
+let bgTank1Distance = 2700;
+let bgTank2Distance = 1500;
+let bgTank3Distance = 10000;
 let supportDistance = 1200;
 
 //support beams values
@@ -93,6 +93,18 @@ let movementKeys = {
 		pressed: false,
 	},
 };
+
+//movement key condition vairables. They need to be public
+let right_was_pressed;
+let left_was_pressed;
+let up_was_pressed;
+let down_was_pressed;
+let up_right_was_pressed;
+let down_right_was_pressed;
+let up_left_was_pressed;
+let down_left_was_pressed;
+let no_directional_keys_pressed;
+
 let actionKeys = {
 	space: {
 		pressed: false,
@@ -103,30 +115,6 @@ let actionKeys = {
 	s: {
 		pressed: false,
 	},
-};
-
-//direction states
-let direction = {
-	right: false,
-	left: false,
-	up: false,
-	down: false,
-	upRight: false,
-	downRight: false,
-	upLeft: false,
-	downLeft: false,
-	stop: true,
-};
-let lastDirection = {
-	right: false,
-	left: false,
-	up: false,
-	down: false,
-	upRight: false,
-	downRight: false,
-	upLeft: false,
-	downLeft: false,
-	stop: true,
 };
 
 //Tracks the players change in canvas x-position from its original position
@@ -155,6 +143,18 @@ function animate() {
 
 	//fill canvas with the color white
 	// utils.canvasStuff.create_colored_canvas('white', 0, 0, utils.canvasStuff.canvas.width, utils.canvasStuff.canvas.height);
+
+	//movement condtions placed in loop to register button presses
+	right_was_pressed = movementKeys.right.pressed == true && movementKeys.left.pressed == false && movementKeys.up.pressed == false && movementKeys.down.pressed == false;
+	left_was_pressed = movementKeys.right.pressed == false && movementKeys.left.pressed == true && movementKeys.up.pressed == false && movementKeys.down.pressed == false;
+	up_was_pressed = movementKeys.right.pressed == false && movementKeys.left.pressed == false && movementKeys.up.pressed == true && movementKeys.down.pressed == false;
+	down_was_pressed = movementKeys.right.pressed == false && movementKeys.left.pressed == false && movementKeys.up.pressed == false && movementKeys.down.pressed == true;
+	up_right_was_pressed = movementKeys.right.pressed == true && movementKeys.left.pressed == false && movementKeys.up.pressed == true && movementKeys.down.pressed == false;
+	down_right_was_pressed = movementKeys.right.pressed == true && movementKeys.left.pressed == false && movementKeys.up.pressed == false && movementKeys.down.pressed == true;
+	up_left_was_pressed = movementKeys.right.pressed == false && movementKeys.left.pressed == true && movementKeys.up.pressed == true && movementKeys.down.pressed == false;
+	down_left_was_pressed = movementKeys.right.pressed == false && movementKeys.left.pressed == true && movementKeys.up.pressed == false && movementKeys.down.pressed == true;
+	no_directional_keys_pressed =
+		movementKeys.right.pressed == false && movementKeys.left.pressed == false && movementKeys.up.pressed == false && movementKeys.down.pressed == false;
 
 	//draw the bg and hills
 	stageBackgroundTiles.forEach((background) => {
@@ -187,7 +187,7 @@ function animate() {
 
 	/*************** things only allowed if the player isn't currently doing an action */
 	if (player.doingSomething == false) {
-		/************** direction states ************/
+		/************** player direction states ************/
 		update_player_direction_state_based_on_button_presses();
 
 		/*************lateral movement and platform scrolling **************/
@@ -198,8 +198,8 @@ function animate() {
 		adjust_player_y_velocity_based_on_player_y_position_and_direction_states();
 
 		/******* directional based sprite switching conditional. **********/
-		if (JSON.stringify(direction) !== JSON.stringify(lastDirection)) {
-			lastDirection = JSON.stringify(direction);
+		if (JSON.stringify(player.directionState) !== JSON.stringify(player.lastDirectionState)) {
+			player.lastDirectionState = JSON.stringify(player.directionState);
 			update_player_directional_sprite_based_on_direction_state();
 		}
 
@@ -212,7 +212,9 @@ function animate() {
 			} else if (lastKey == 'left') {
 				player.update_player_action_sprite_based_on_action_state(player.sprites.punch.left, lastKey, player.sprites.punch.cropWidth, player.sprites.punch.width);
 			}
-		} else if (player.action.bite == true) {
+		}
+		//player biting
+		else if (player.action.bite == true) {
 			player.sound.bite.play();
 			player.sound.dragon.play();
 			if (lastKey == 'right') {
@@ -220,7 +222,9 @@ function animate() {
 			} else if (lastKey == 'left') {
 				player.update_player_action_sprite_based_on_action_state(player.sprites.bite.left, lastKey, player.sprites.bite.cropWidth, player.sprites.bite.width);
 			}
-		} else if (player.action.swipe == true) {
+		}
+		//player swiping
+		else if (player.action.swipe == true) {
 			player.sound.swipe.play();
 			player.sound.wetFart.play();
 			if (lastKey == 'right') {
@@ -333,182 +337,101 @@ function update_player_action_state_based_on_button_presses() {
 
 function update_player_direction_state_based_on_button_presses() {
 	//right
-	if (movementKeys.right.pressed == true && movementKeys.left.pressed == false && movementKeys.up.pressed == false && movementKeys.down.pressed == false) {
-		direction.right = true;
-		direction.left = false;
-		direction.up = false;
-		direction.down = false;
-		direction.upRight = false;
-		direction.downRight = false;
-		direction.upLeft = false;
-		direction.downLeft = false;
-		direction.stop = false;
-		// console.log('right pressed');
+	if (right_was_pressed) {
+		player.set_movement_state_to_right();
 
 		if (player.step.one == false) {
 			player.play_first_footStep();
 		}
 	}
 	//left
-	else if (movementKeys.right.pressed == false && movementKeys.left.pressed == true && movementKeys.up.pressed == false && movementKeys.down.pressed == false) {
-		direction.right = false;
-		direction.left = true;
-		direction.up = false;
-		direction.down = false;
-		direction.upRight = false;
-		direction.downRight = false;
-		direction.upLeft = false;
-		direction.downLeft = false;
-		direction.stop = false;
-		// console.log('left pressed');
+	else if (left_was_pressed) {
+		player.set_movement_state_to_left();
 
 		if (player.step.one == false) {
 			player.play_first_footStep();
 		}
 	}
 	//up
-	else if (movementKeys.right.pressed == false && movementKeys.left.pressed == false && movementKeys.up.pressed == true && movementKeys.down.pressed == false) {
-		direction.right = false;
-		direction.left = false;
-		direction.up = true;
-		direction.down = false;
-		direction.upRight = false;
-		direction.downRight = false;
-		direction.upLeft = false;
-		direction.downLeft = false;
-		direction.stop = false;
-		// console.log('up pressed');
+	else if (up_was_pressed) {
+		player.set_movement_state_to_up();
 
 		if (player.step.one == false) {
 			player.play_first_footStep();
 		}
 	}
 	//down
-	else if (movementKeys.right.pressed == false && movementKeys.left.pressed == false && movementKeys.up.pressed == false && movementKeys.down.pressed == true) {
-		direction.right = false;
-		direction.left = false;
-		direction.up = false;
-		direction.down = true;
-		direction.upRight = false;
-		direction.downRight = false;
-		direction.upLeft = false;
-		direction.downLeft = false;
-		direction.stop = false;
-		// console.log('down pressed');
+	else if (down_was_pressed) {
+		player.set_movement_state_to_down();
 
 		if (player.step.one == false) {
 			player.play_first_footStep();
 		}
 	}
 	//up right
-	else if (movementKeys.right.pressed == true && movementKeys.left.pressed == false && movementKeys.up.pressed == true && movementKeys.down.pressed == false) {
-		// console.log('up right pressed');
-		direction.right = false;
-		direction.left = false;
-		direction.up = false;
-		direction.down = false;
-		direction.upRight = true;
-		direction.downRight = false;
-		direction.upLeft = false;
-		direction.downLeft = false;
-		direction.stop = false;
+	else if (up_right_was_pressed) {
+		player.set_movement_state_to_up_right();
 
 		if (player.step.one == false) {
 			player.play_first_footStep();
 		}
 	}
 	//down right
-	else if (movementKeys.right.pressed == true && movementKeys.left.pressed == false && movementKeys.up.pressed == false && movementKeys.down.pressed == true) {
-		// console.log('down right pressed');
-		direction.right = false;
-		direction.left = false;
-		direction.up = false;
-		direction.down = false;
-		direction.upRight = false;
-		direction.downRight = true;
-		direction.upLeft = false;
-		direction.downLeft = false;
-		direction.stop = false;
+	else if (down_right_was_pressed) {
+		player.set_movement_state_to_down_right();
 
 		if (player.step.one == false) {
 			player.play_first_footStep();
 		}
 	}
 	//up left
-	else if (movementKeys.right.pressed == false && movementKeys.left.pressed == true && movementKeys.up.pressed == true && movementKeys.down.pressed == false) {
-		// console.log('up left pressed');
-		direction.right = false;
-		direction.left = false;
-		direction.up = false;
-		direction.down = false;
-		direction.upRight = false;
-		direction.downRight = false;
-		direction.upLeft = true;
-		direction.downLeft = false;
-		direction.stop = false;
+	else if (up_left_was_pressed) {
+		player.set_movement_state_to_up_left();
 
 		if (player.step.one == false) {
 			player.play_first_footStep();
 		}
 	}
 	//down left
-	else if (movementKeys.right.pressed == false && movementKeys.left.pressed == true && movementKeys.up.pressed == false && movementKeys.down.pressed == true) {
-		// console.log('down left pressed');
-		direction.right = false;
-		direction.left = false;
-		direction.up = false;
-		direction.down = false;
-		direction.upRight = false;
-		direction.downRight = false;
-		direction.upLeft = false;
-		direction.downLeft = true;
-		direction.stop = false;
+	else if (down_left_was_pressed) {
+		player.set_movement_state_to_down_left();
 
 		if (player.step.one == false) {
 			player.play_first_footStep();
 		}
 	}
 	//nothing pressed
-	else if (movementKeys.right.pressed == false && movementKeys.left.pressed == false && movementKeys.up.pressed == false && movementKeys.down.pressed == false) {
-		// console.log('Nothing pressed');
-		direction.right = false;
-		direction.left = false;
-		direction.up = false;
-		direction.down = false;
-		direction.upRight = false;
-		direction.downRight = false;
-		direction.upLeft = false;
-		direction.downLeft = false;
-		direction.stop = true;
+	else if (no_directional_keys_pressed) {
+		player.set_movement_state_to_stop();
 
 		player.step.one == false;
 	}
 }
 
 function adjust_player_x_velocity_and_background_and_foreground_based_on_player_x_position_and_direction_states() {
-	if (direction.right == true && player.position.x < 50) {
-		player.velocity.x = player.speed;
-	} else if ((direction.upRight == true || direction.downRight == true) && player.position.x < 50) {
-		player.velocity.x = player.speed / 2;
-	} else if ((direction.left == true && player.position.x > -100) || (direction.left == true && scrollOffset == 0 && player.position.x > -380)) {
-		player.velocity.x = -player.speed;
+	if (player.directionState.right == true && player.position.x < 50) {
+		player.move_right_full_speed();
+	} else if ((player.directionState.upRight == true || player.directionState.downRight == true) && player.position.x < 50) {
+		player.move_right_half_speed();
+	} else if ((player.directionState.left == true && player.position.x > -100) || (player.directionState.left == true && scrollOffset == 0 && player.position.x > -380)) {
+		player.move_left_full_speed();
 	} else if (
-		((direction.upLeft == true || direction.downLeft == true) && player.position.x > -100) ||
-		((direction.upLeft == true || direction.downLeft == true) && scrollOffset == 0 && player.position.x > -380)
+		((player.directionState.upLeft == true || player.directionState.downLeft == true) && player.position.x > -100) ||
+		((player.directionState.upLeft == true || player.directionState.downLeft == true) && scrollOffset == 0 && player.position.x > -380)
 	) {
-		player.velocity.x = -player.speed / 2;
+		player.move_left_half_speed();
 	} else if (
-		direction.right == false &&
-		direction.upRight == false &&
-		direction.downRight == false &&
-		direction.left == false &&
-		direction.upLeft == false &&
-		direction.downLeft == false
+		player.directionState.right == false &&
+		player.directionState.upRight == false &&
+		player.directionState.downRight == false &&
+		player.directionState.left == false &&
+		player.directionState.upLeft == false &&
+		player.directionState.downLeft == false
 	) {
-		player.velocity.x = 0;
+		player.stop_horizontal_movement();
 	} else {
-		player.velocity.x = 0;
-		if (direction.right == true) {
+		player.stop_horizontal_movement();
+		if (player.directionState.right == true) {
 			//console.log('scroll offset', scrollOffset);
 			scrollOffset += player.speed;
 			platforms.forEach((platform) => {
@@ -529,7 +452,7 @@ function adjust_player_x_velocity_and_background_and_foreground_based_on_player_
 			stageBackgroundTiles.forEach((background) => {
 				background.position.x -= player.speed * 0.66; // move the background hills a little slower than everything else
 			});
-		} else if (direction.upRight == true || direction.downRight == true) {
+		} else if (player.directionState.upRight == true || player.directionState.downRight == true) {
 			scrollOffset += player.speed / 2;
 			stageBackgroundItems.forEach((item) => {
 				item.position.x -= (player.speed * 0.66) / 2;
@@ -549,7 +472,7 @@ function adjust_player_x_velocity_and_background_and_foreground_based_on_player_
 			stageBackgroundTiles.forEach((background) => {
 				background.position.x -= (player.speed * 0.66) / 2; // move the background hills a little slower than everything else
 			});
-		} else if (direction.left == true && scrollOffset > 0) {
+		} else if (player.directionState.left == true && scrollOffset > 0) {
 			//console.log('scroll offset', scrollOffset);
 			scrollOffset -= player.speed;
 			stageBackgroundItems.forEach((item) => {
@@ -571,7 +494,7 @@ function adjust_player_x_velocity_and_background_and_foreground_based_on_player_
 			stageBackgroundTiles.forEach((background) => {
 				background.position.x += player.speed * 0.66; // move the background hills a little slower than everything else
 			});
-		} else if ((direction.upLeft == true || direction.downLeft == true) && scrollOffset > 0) {
+		} else if ((player.directionState.upLeft == true || player.directionState.downLeft == true) && scrollOffset > 0) {
 			scrollOffset -= player.speed / 2;
 			stageBackgroundItems.forEach((item) => {
 				item.position.x += (player.speed * 0.66) / 2;
@@ -596,38 +519,42 @@ function adjust_player_x_velocity_and_background_and_foreground_based_on_player_
 }
 
 function adjust_player_y_velocity_based_on_player_y_position_and_direction_states() {
-	if (direction.up == true && player.position.y >= canvas.height - 480) {
-		player.velocity.y = -player.speed;
+	if (player.directionState.up == true && player.position.y >= canvas.height - 480) {
+		player.move_up_full_speed();
 
 		// console.log('go up. Player position :', player.position);
-	} else if ((direction.upRight == true || direction.upLeft == true) && player.position.y >= canvas.height - 480) {
-		player.velocity.y = -player.speed / 2;
+	} else if ((player.directionState.upRight == true || player.directionState.upLeft == true) && player.position.y >= canvas.height - 480) {
+		player.move_up_half_speed();
 
 		// console.log('go angled up. Player position :', player.position);
-	} else if (direction.down == true && player.position.y + player.height - 290 <= canvas.height) {
-		player.velocity.y = player.speed;
+	} else if (player.directionState.down == true && player.position.y + player.height - 290 <= canvas.height) {
+		player.move_down_full_speed();
 		// console.log('go down. Player position :', player.position);
-	} else if ((direction.downRight == true || direction.downLeft == true) && player.position.y + player.height - 290 <= canvas.height) {
-		player.velocity.y = player.speed / 2;
+	} else if ((player.directionState.downRight == true || player.directionState.downLeft == true) && player.position.y + player.height - 290 <= canvas.height) {
+		player.move_down_half_speed();
 		// console.log('go angled down. Player position :', player.position);
 	} else if (
-		direction.up == false &&
-		direction.upRight == false &&
-		direction.upLeft == false &&
-		direction.down == false &&
-		direction.downRight == false &&
-		direction.downLeft == false
+		player.directionState.up == false &&
+		player.directionState.upRight == false &&
+		player.directionState.upLeft == false &&
+		player.directionState.down == false &&
+		player.directionState.downRight == false &&
+		player.directionState.downLeft == false
 	) {
-		player.velocity.y = 0;
+		player.stop_vertical_movement();
 	} else {
-		player.velocity.y = 0;
+		player.stop_vertical_movement();
 	}
 }
 
 function update_player_directional_sprite_based_on_direction_state() {
 	//change to run right sprite
 	if (
-		(direction.up == true || direction.down == true || direction.right == true || direction.upRight == true || direction.downRight == true) &&
+		(player.directionState.up == true ||
+			player.directionState.down == true ||
+			player.directionState.right == true ||
+			player.directionState.upRight == true ||
+			player.directionState.downRight == true) &&
 		lastKey == 'right' &&
 		player.currentSprite != player.sprites.run.right
 	) {
@@ -637,7 +564,11 @@ function update_player_directional_sprite_based_on_direction_state() {
 
 	//change to run left sprite
 	else if (
-		(direction.up == true || direction.down == true || direction.left == true || direction.upLeft == true || direction.downLeft == true) &&
+		(player.directionState.up == true ||
+			player.directionState.down == true ||
+			player.directionState.left == true ||
+			player.directionState.upLeft == true ||
+			player.directionState.downLeft == true) &&
 		lastKey == 'left' &&
 		player.currentSprite != player.sprites.run.left
 	) {
@@ -646,13 +577,13 @@ function update_player_directional_sprite_based_on_direction_state() {
 	}
 
 	//change to idle left sprite
-	else if (direction.stop == true && lastKey == 'left' && player.currentSprite != player.sprites.stand.left) {
+	else if (player.directionState.stop == true && lastKey == 'left' && player.currentSprite != player.sprites.stand.left) {
 		player.reset_frames_and_sprite_counter();
 		player.change_sprite_based_on_direction_input(player.sprites.stand.left, 'left', player.sprites.stand.cropWidth, player.sprites.stand.width);
 	}
 
 	//change to idle right sprite
-	else if (direction.stop == true && lastKey == 'right' && player.currentSprite != player.sprites.stand.right) {
+	else if (player.directionState.stop == true && lastKey == 'right' && player.currentSprite != player.sprites.stand.right) {
 		player.reset_frames_and_sprite_counter();
 		player.change_sprite_based_on_direction_input(player.sprites.stand.right, 'right', player.sprites.stand.cropWidth, player.sprites.stand.width);
 	}
@@ -709,6 +640,14 @@ window.addEventListener('keydown', (event) => {
 			// console.log('s');
 			if (player.startAnimation == false && player.doingSomething == false) {
 				actionKeys.s.pressed = true;
+			}
+			break;
+
+		case 'x':
+			// console.log('x');
+			if (player.startAnimation == false) {
+				player.doingSomething = !player.doingSomething;
+				console.log('player doing something: ', player.doingSomething);
 			}
 			break;
 	}
@@ -846,6 +785,11 @@ function calcNeilPics() {
 		width: 200 * 4 + 200 / 2,
 		name: 'walk',
 	};
+	let idle = {
+		pics: 1,
+		width: 200 * 1 + 200 / 2,
+		name: 'idle',
+	};
 
 	let currentSelection = walk;
 
@@ -859,7 +803,7 @@ function calcNeilPics() {
 	// calc left foot at center of a 200 image
 	if (currentSelection == walk) {
 		for (let i = 0; i < pics; i++) {
-			let booty = 200 * i + 200 / 2 + 40;
+			let booty = 200 * i + 200 / 2 + 30;
 			console.log('Image ', i + 1, 'booty: ', booty);
 		}
 	} else {

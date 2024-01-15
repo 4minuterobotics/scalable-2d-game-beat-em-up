@@ -106,6 +106,28 @@ class Player {
 		this.currentCropWidth = INDIVIDUAL_SPRITE_WIDTH;
 		this.currentSpriteImages = this.sprites.start.images;
 		this.lastDirection = 'right';
+		this.directionState = {
+			right: false,
+			left: false,
+			up: false,
+			down: false,
+			upRight: false,
+			downRight: false,
+			upLeft: false,
+			downLeft: false,
+			stop: true,
+		};
+		this.lastDirectionState = {
+			right: false,
+			left: false,
+			up: false,
+			down: false,
+			upRight: false,
+			downRight: false,
+			upLeft: false,
+			downLeft: false,
+			stop: true,
+		};
 		this.action = {
 			punch: false,
 			bite: false,
@@ -125,9 +147,6 @@ class Player {
 			one: false,
 			two: false,
 		};
-
-		//sprite changing conditions
-		this.start_animation_active_and_all_sprites_have_been_shown = this.spriteCounter == this.currentSpriteImages && this.startAnimation == true;
 	}
 	//the player methods
 	draw() {
@@ -195,6 +214,168 @@ class Player {
 		}
 	}
 
+	//movement state updates
+	set_movement_state_to_right() {
+		//right
+		this.directionState.right = true;
+		this.directionState.left = false;
+		this.directionState.up = false;
+		this.directionState.down = false;
+		this.directionState.upRight = false;
+		this.directionState.downRight = false;
+		this.directionState.upLeft = false;
+		this.directionState.downLeft = false;
+		this.directionState.stop = false;
+		// console.log('right pressed');
+	}
+
+	set_movement_state_to_left() {
+		//left
+		this.directionState.right = false;
+		this.directionState.left = true;
+		this.directionState.up = false;
+		this.directionState.down = false;
+		this.directionState.upRight = false;
+		this.directionState.downRight = false;
+		this.directionState.upLeft = false;
+		this.directionState.downLeft = false;
+		this.directionState.stop = false;
+		// console.log('left pressed');
+	}
+
+	set_movement_state_to_up() {
+		//up
+		this.directionState.right = false;
+		this.directionState.left = false;
+		this.directionState.up = true;
+		this.directionState.down = false;
+		this.directionState.upRight = false;
+		this.directionState.downRight = false;
+		this.directionState.upLeft = false;
+		this.directionState.downLeft = false;
+		this.directionState.stop = false;
+		// console.log('up pressed');
+	}
+
+	set_movement_state_to_down() {
+		//down
+		this.directionState.right = false;
+		this.directionState.left = false;
+		this.directionState.up = false;
+		this.directionState.down = true;
+		this.directionState.upRight = false;
+		this.directionState.downRight = false;
+		this.directionState.upLeft = false;
+		this.directionState.downLeft = false;
+		this.directionState.stop = false;
+		// console.log('down pressed');
+	}
+
+	set_movement_state_to_up_right() {
+		// up right
+		this.directionState.right = false;
+		this.directionState.left = false;
+		this.directionState.up = false;
+		this.directionState.down = false;
+		this.directionState.upRight = true;
+		this.directionState.downRight = false;
+		this.directionState.upLeft = false;
+		this.directionState.downLeft = false;
+		this.directionState.stop = false;
+		// console.log('up right pressed');
+	}
+
+	set_movement_state_to_down_right() {
+		// down right
+		this.directionState.right = false;
+		this.directionState.left = false;
+		this.directionState.up = false;
+		this.directionState.down = false;
+		this.directionState.upRight = false;
+		this.directionState.downRight = true;
+		this.directionState.upLeft = false;
+		this.directionState.downLeft = false;
+		this.directionState.stop = false;
+		// console.log('down right pressed');
+	}
+
+	set_movement_state_to_up_left() {
+		//up left
+		this.directionState.right = false;
+		this.directionState.left = false;
+		this.directionState.up = false;
+		this.directionState.down = false;
+		this.directionState.upRight = false;
+		this.directionState.downRight = false;
+		this.directionState.upLeft = true;
+		this.directionState.downLeft = false;
+		this.directionState.stop = false;
+		// console.log('up left pressed');
+	}
+
+	set_movement_state_to_down_left() {
+		//down left
+		this.directionState.right = false;
+		this.directionState.left = false;
+		this.directionState.up = false;
+		this.directionState.down = false;
+		this.directionState.upRight = false;
+		this.directionState.downRight = false;
+		this.directionState.upLeft = false;
+		this.directionState.downLeft = true;
+		this.directionState.stop = false;
+		// console.log('down left pressed');
+	}
+
+	set_movement_state_to_stop() {
+		// stop
+		this.directionState.right = false;
+		this.directionState.left = false;
+		this.directionState.up = false;
+		this.directionState.down = false;
+		this.directionState.upRight = false;
+		this.directionState.downRight = false;
+		this.directionState.upLeft = false;
+		this.directionState.downLeft = false;
+		this.directionState.stop = true;
+		// console.log('Nothing pressed');
+	}
+
+	//horizontal x-direction movement functions
+	move_right_full_speed() {
+		this.velocity.x = this.speed;
+	}
+	move_left_full_speed() {
+		this.velocity.x = -this.speed;
+	}
+	move_right_half_speed() {
+		this.velocity.x = this.speed / 2;
+	}
+	move_left_half_speed() {
+		this.velocity.x = -this.speed / 2;
+	}
+	stop_horizontal_movement() {
+		this.velocity.x = 0;
+	}
+
+	//vertical y-direction movement functions
+	move_up_full_speed() {
+		this.velocity.y = -this.speed;
+	}
+	move_down_full_speed() {
+		this.velocity.y = this.speed;
+	}
+	move_up_half_speed() {
+		this.velocity.y = -this.speed / 2;
+	}
+	move_down_half_speed() {
+		this.velocity.y = this.speed / 2;
+	}
+	stop_vertical_movement() {
+		this.velocity.y = 0;
+	}
+
+	//action sprite update function
 	change_sprite_based_on_direction_input(sprite, lastDir, cropWidth, width) {
 		this.currentSprite = sprite;
 		this.lastDirection = lastDir;
@@ -202,6 +383,7 @@ class Player {
 		this.width = width;
 	}
 
+	//direction sprite update function
 	update_player_action_sprite_based_on_action_state(sprite, lastDir, cropWidth, width) {
 		this.doingSomething = true;
 		this.reset_frames_and_sprite_counter();
@@ -224,10 +406,7 @@ class Player {
 		}
 
 		//cycled through standing images
-		else if (
-			this.spriteCounter == this.sprites.stand.images &&
-			(this.currentSprite == this.sprites.stand.right || this.currentSprite == this.sprites.stand.left)
-		) {
+		else if (this.spriteCounter == this.sprites.stand.images && (this.currentSprite == this.sprites.stand.right || this.currentSprite == this.sprites.stand.left)) {
 			this.reset_frames_and_sprite_counter();
 		}
 
@@ -241,19 +420,13 @@ class Player {
 		}
 
 		//player cycled through running images
-		else if (
-			this.spriteCounter == this.sprites.run.images &&
-			(this.currentSprite == this.sprites.run.right || this.currentSprite == this.sprites.run.left)
-		) {
+		else if (this.spriteCounter == this.sprites.run.images && (this.currentSprite == this.sprites.run.right || this.currentSprite == this.sprites.run.left)) {
 			this.reset_frames_and_sprite_counter();
 			this.reset_footsteps();
 		}
 
 		//player cycled through punch images
-		else if (
-			this.spriteCounter == this.sprites.punch.images &&
-			(this.currentSprite == this.sprites.punch.right || this.currentSprite == this.sprites.punch.left)
-		) {
+		else if (this.spriteCounter == this.sprites.punch.images && (this.currentSprite == this.sprites.punch.right || this.currentSprite == this.sprites.punch.left)) {
 			this.reset_frames_and_sprite_counter();
 			this.doingSomething = false;
 			this.action.punch = false;
@@ -261,10 +434,7 @@ class Player {
 		}
 
 		//player cycled through bite images
-		else if (
-			this.spriteCounter == this.sprites.bite.images &&
-			(this.currentSprite == this.sprites.bite.right || this.currentSprite == this.sprites.bite.left)
-		) {
+		else if (this.spriteCounter == this.sprites.bite.images && (this.currentSprite == this.sprites.bite.right || this.currentSprite == this.sprites.bite.left)) {
 			this.reset_frames_and_sprite_counter();
 			this.doingSomething = false;
 			this.action.bite = false;
@@ -272,10 +442,7 @@ class Player {
 		}
 
 		//player cycled through swipe images
-		else if (
-			this.spriteCounter == this.sprites.swipe.images &&
-			(this.currentSprite == this.sprites.swipe.right || this.currentSprite == this.sprites.swipe.left)
-		) {
+		else if (this.spriteCounter == this.sprites.swipe.images && (this.currentSprite == this.sprites.swipe.right || this.currentSprite == this.sprites.swipe.left)) {
 			this.reset_frames_and_sprite_counter();
 			this.doingSomething = false;
 			this.action.swipe = false;
