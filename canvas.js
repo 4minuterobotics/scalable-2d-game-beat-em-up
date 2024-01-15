@@ -120,6 +120,9 @@ let actionKeys = {
 //Tracks the players change in canvas x-position from its original position
 let scrollOffset = 0;
 
+/**
+ * Initializes the game and starts the animation loop.
+ */
 function main() {
 	init();
 	animate();
@@ -132,55 +135,70 @@ function init() {
 	create_game_objects();
 	//this variable will track the players change in canvas x-position from its original position
 	scrollOffset = 0;
+
+	/*************************helper functions*****************************/
+	function create_game_objects() {
+		player = new Player();
+		platforms = [
+			// accepts x,y,image
+			new Platform(-1, 470, platformImage), // first standing platform
+			new Platform(platformImage.width, 470, platformImage), // 2nd platform with x-positiion set 1 platform width away from the origin
+			new Platform(platformImage.width * 2, 470, platformImage), // 3rd platform with x-position set 2 platform widths + 100 px away from the origin to create a death pit
+			new Platform(platformImage.width * 3, 470, platformImage), // 4th platform with x-position set 3 platform widths + 300 px away from the origin
+			new Platform(platformImage.width * 4, 470, platformImage), // 5th platform with x-position set 4 platform widths + 300 px away from the origin
+			new Platform(platformImage.width * 5, 470, platformImage), // 6th platform with x-position set 4 platform widths + 300 px away from the origin
+			new Platform(platformImage.width * 6, 470, platformImage), // 7th platform with x-position set 4 platform widths + 300 px away from the origin
+			new Platform(platformImage.width * 7, 470, platformImage), // 8th platform with x-position set 4 platform widths + 300 px away from the origin
+		];
+		stageBackgroundTiles = utils.stageStuff.createStageBackgroundTiles(15, -320, bgWidth, bgHeight, backImage);
+		stageForegroundItems = utils.stageStuff.createStageItems(10, 50, 0, supportDistance, supportWidth, supportHeight, supportImage);
+		//tank 1
+		stageBackgroundItems = utils.stageStuff.createStageItems(10, bgTank1Distance, canvas.height - 595, bgTank1Distance, bgTankWidth, bgTankHeight, tank1Image);
+		//tank2
+		stageBackgroundItems2 = utils.stageStuff.createStageItems(10, bgTank2Distance, canvas.height - 595, bgTank2Distance, bgTankWidth, bgTankHeight, tank2Image);
+		//tank 3
+		stageBackgroundItems3 = utils.stageStuff.createStageItems(10, bgTank3Distance, canvas.height - 595, bgTank3Distance, bgTankWidth, bgTankHeight, tank3Image);
+		// stageBackgroundItems3 = utils.stageStuff.createStageItems(
+		// 	10,
+		// 	imageStuff.bgItems.darkBgItems.darkTank.x_gap,
+		// 	imageStuff.bgItems.darkBgItems.darkTank.y,
+		// 	imageStuff.bgItems.darkBgItems.darkTank.x_gap,
+		// 	imageStuff.bgItems.darkBgItems.darkTank.width,
+		// 	imageStuff.bgItems.darkBgItems.darkTank.height,
+		// 	imageStuff.bgItems.darkBgItems.darkTank.image
+		// );
+	}
 }
 
 //this function loops every millisec
 function animate() {
-	window.requestAnimationFrame(animate); // this is a JavaScript function that caues code to repeat over n over
-
 	c.fillStyle = 'white';
 	c.fillRect(0, 0, canvas.width, canvas.height);
 
 	//fill canvas with the color white
 	// utils.canvasStuff.create_colored_canvas('white', 0, 0, utils.canvasStuff.canvas.width, utils.canvasStuff.canvas.height);
 
-	//movement condtions placed in loop to register button presses
-	right_was_pressed = movementKeys.right.pressed == true && movementKeys.left.pressed == false && movementKeys.up.pressed == false && movementKeys.down.pressed == false;
-	left_was_pressed = movementKeys.right.pressed == false && movementKeys.left.pressed == true && movementKeys.up.pressed == false && movementKeys.down.pressed == false;
-	up_was_pressed = movementKeys.right.pressed == false && movementKeys.left.pressed == false && movementKeys.up.pressed == true && movementKeys.down.pressed == false;
-	down_was_pressed = movementKeys.right.pressed == false && movementKeys.left.pressed == false && movementKeys.up.pressed == false && movementKeys.down.pressed == true;
-	up_right_was_pressed = movementKeys.right.pressed == true && movementKeys.left.pressed == false && movementKeys.up.pressed == true && movementKeys.down.pressed == false;
-	down_right_was_pressed = movementKeys.right.pressed == true && movementKeys.left.pressed == false && movementKeys.up.pressed == false && movementKeys.down.pressed == true;
-	up_left_was_pressed = movementKeys.right.pressed == false && movementKeys.left.pressed == true && movementKeys.up.pressed == true && movementKeys.down.pressed == false;
-	down_left_was_pressed = movementKeys.right.pressed == false && movementKeys.left.pressed == true && movementKeys.up.pressed == false && movementKeys.down.pressed == true;
-	no_directional_keys_pressed =
-		movementKeys.right.pressed == false && movementKeys.left.pressed == false && movementKeys.up.pressed == false && movementKeys.down.pressed == false;
+	//drawing items
+	const drawItems = (items) => {
+		items.forEach((item) => {
+			item.draw();
+		});
+	};
 
-	//draw the bg and hills
-	stageBackgroundTiles.forEach((background) => {
-		background.draw();
-	});
-
+	//draw background tiles
+	drawItems(stageBackgroundTiles);
 	//draw tank1 tanks
-	stageBackgroundItems.forEach((item) => {
-		item.draw();
-	});
+	drawItems(stageBackgroundItems);
 	//draw tank2 tanks
-	stageBackgroundItems2.forEach((item) => {
-		item.draw();
-	});
+	drawItems(stageBackgroundItems2);
 	//draw tank3 tanks
-	stageBackgroundItems3.forEach((item) => {
-		item.draw();
-	});
+	drawItems(stageBackgroundItems3);
 
 	//upadate the player spite frame number and crop position, then draws the sprite onto the screen, then updates its positon value
 	player.update();
 
 	//draw the support beams
-	stageForegroundItems.forEach((beam) => {
-		beam.draw();
-	});
+	drawItems(stageForegroundItems);
 
 	/*************** action states ************/
 	update_player_action_state_based_on_button_presses();
@@ -198,42 +216,10 @@ function animate() {
 		adjust_player_y_velocity_based_on_player_y_position_and_direction_states();
 
 		/******* directional based sprite switching conditional. **********/
-		if (JSON.stringify(player.directionState) !== JSON.stringify(player.lastDirectionState)) {
-			player.lastDirectionState = JSON.stringify(player.directionState);
-			update_player_directional_sprite_based_on_direction_state();
-		}
+		handle_player_directional_sprite_based_on_direction_state();
 
-		//player punching
-		if (player.action.punch == true) {
-			player.sound.punch.play();
-			player.sound.myVoice.play();
-			if (lastKey == 'right') {
-				player.update_player_action_sprite_based_on_action_state(player.sprites.punch.right, lastKey, player.sprites.punch.cropWidth, player.sprites.punch.width);
-			} else if (lastKey == 'left') {
-				player.update_player_action_sprite_based_on_action_state(player.sprites.punch.left, lastKey, player.sprites.punch.cropWidth, player.sprites.punch.width);
-			}
-		}
-		//player biting
-		else if (player.action.bite == true) {
-			player.sound.bite.play();
-			player.sound.dragon.play();
-			if (lastKey == 'right') {
-				player.update_player_action_sprite_based_on_action_state(player.sprites.bite.right, lastKey, player.sprites.bite.cropWidth, player.sprites.bite.width);
-			} else if (lastKey == 'left') {
-				player.update_player_action_sprite_based_on_action_state(player.sprites.bite.left, lastKey, player.sprites.bite.cropWidth, player.sprites.bite.width);
-			}
-		}
-		//player swiping
-		else if (player.action.swipe == true) {
-			player.sound.swipe.play();
-			player.sound.wetFart.play();
-			if (lastKey == 'right') {
-				player.reset_frames_and_sprite_counter();
-				player.update_player_action_sprite_based_on_action_state(player.sprites.swipe.right, lastKey, player.sprites.swipe.cropWidth, player.sprites.swipe.width);
-			} else if (lastKey == 'left') {
-				player.update_player_action_sprite_based_on_action_state(player.sprites.swipe.left, lastKey, player.sprites.swipe.cropWidth, player.sprites.swipe.width);
-			}
-		}
+		/******* action based sprite switching conditional. **********/
+		handle_action_sprite_changes_based_on_action_state();
 	}
 
 	//win scenario
@@ -247,77 +233,7 @@ function animate() {
 		init(); // reset player stats
 	}
 
-	/**********detect platform collision from top*********/
-	//check to see if:
-	//the player above the platform by seeing if the player y anchor value plus its height value is less than the platform anchor point value
-	//the player's next change in position (velocity) is below the top of the platform by seeing if the player's y anchor value plus its height value plus its next change in position is greater than the anchor position of the platform
-	//there is platform to the right of the player by seeing if the player's x anchor value plus its width value is greater than x anchor value of the platform
-	//and there is platform to the left of the player by seeing if the player's x anchor value is less than the platforms x anchor value plus its width
-	// platforms.forEach((platform) => {
-	// 	if (
-	// 		player.position.y + player.height <= platform.position.y &&
-	// 		player.position.y + player.height + player.velocity.y >= platform.position.y &&
-	// 		player.position.x + player.width >= platform.position.x &&
-	// 		player.position.x <= platform.position.x + platform.width
-	// 	) {
-	// 		player.velocity.y = 0;
-	// 		player.position.y = platform.position.y - player.height;
-	// 	}
-
-	/**********detect platform collision from bottom*********/
-	/*	//check to see if:
-		//the player below the platform by seeing if the player y anchor value is greater than the platform anchor point value plus its height
-		//the player's next change in position (velocity) is above the bottom of the platform by seeing if the player's y anchor value plus its next change in position is less than the platform y-anchor position + its height
-		//there is platform to the right of the player by seeing if the player's x anchor value plus its width value is greater than x anchor value of the platform
-		//and there is platform to the left of the player by seeing if the player's x anchor value is less than the platforms x anchor value plus its width
-		if (
-			player.position.y >= platform.position.y + platform.height &&
-			player.position.y + player.velocity.y <= platform.position.y + platform.height &&
-			player.position.x + player.width >= platform.position.x &&
-			player.position.x <= platform.position.x + platform.width
-		) {
-			player.velocity.y = 0;
-			player.position.y = platform.position.y + platform.height;
-		}*/
-
-	// });
-}
-
-function create_game_objects() {
-	player = new Player();
-
-	platforms = [
-		// accepts x,y,image
-		new Platform(-1, 470, platformImage), // first standing platform
-		new Platform(platformImage.width, 470, platformImage), // 2nd platform with x-positiion set 1 platform width away from the origin
-		new Platform(platformImage.width * 2, 470, platformImage), // 3rd platform with x-position set 2 platform widths + 100 px away from the origin to create a death pit
-		new Platform(platformImage.width * 3, 470, platformImage), // 4th platform with x-position set 3 platform widths + 300 px away from the origin
-		new Platform(platformImage.width * 4, 470, platformImage), // 5th platform with x-position set 4 platform widths + 300 px away from the origin
-		new Platform(platformImage.width * 5, 470, platformImage), // 6th platform with x-position set 4 platform widths + 300 px away from the origin
-		new Platform(platformImage.width * 6, 470, platformImage), // 7th platform with x-position set 4 platform widths + 300 px away from the origin
-		new Platform(platformImage.width * 7, 470, platformImage), // 8th platform with x-position set 4 platform widths + 300 px away from the origin
-	];
-
-	stageBackgroundTiles = utils.stageStuff.createStageBackgroundTiles(15, -320, bgWidth, bgHeight, backImage);
-	stageForegroundItems = utils.stageStuff.createStageItems(10, 50, 0, supportDistance, supportWidth, supportHeight, supportImage);
-
-	//tank 1
-	stageBackgroundItems = utils.stageStuff.createStageItems(10, bgTank1Distance, canvas.height - 595, bgTank1Distance, bgTankWidth, bgTankHeight, tank1Image);
-
-	//tank2
-	stageBackgroundItems2 = utils.stageStuff.createStageItems(10, bgTank2Distance, canvas.height - 595, bgTank2Distance, bgTankWidth, bgTankHeight, tank2Image);
-
-	//tank 3
-	stageBackgroundItems3 = utils.stageStuff.createStageItems(10, bgTank3Distance, canvas.height - 595, bgTank3Distance, bgTankWidth, bgTankHeight, tank3Image);
-	// stageBackgroundItems3 = utils.stageStuff.createStageItems(
-	// 	10,
-	// 	imageStuff.bgItems.darkBgItems.darkTank.x_gap,
-	// 	imageStuff.bgItems.darkBgItems.darkTank.y,
-	// 	imageStuff.bgItems.darkBgItems.darkTank.x_gap,
-	// 	imageStuff.bgItems.darkBgItems.darkTank.width,
-	// 	imageStuff.bgItems.darkBgItems.darkTank.height,
-	// 	imageStuff.bgItems.darkBgItems.darkTank.image
-	// );
+	window.requestAnimationFrame(animate); // this is a JavaScript function that caues code to repeat over n over
 }
 
 function update_player_action_state_based_on_button_presses() {
@@ -336,6 +252,18 @@ function update_player_action_state_based_on_button_presses() {
 }
 
 function update_player_direction_state_based_on_button_presses() {
+	//movement condtions placed in loop to register button presses
+	right_was_pressed = movementKeys.right.pressed == true && movementKeys.left.pressed == false && movementKeys.up.pressed == false && movementKeys.down.pressed == false;
+	left_was_pressed = movementKeys.right.pressed == false && movementKeys.left.pressed == true && movementKeys.up.pressed == false && movementKeys.down.pressed == false;
+	up_was_pressed = movementKeys.right.pressed == false && movementKeys.left.pressed == false && movementKeys.up.pressed == true && movementKeys.down.pressed == false;
+	down_was_pressed = movementKeys.right.pressed == false && movementKeys.left.pressed == false && movementKeys.up.pressed == false && movementKeys.down.pressed == true;
+	up_right_was_pressed = movementKeys.right.pressed == true && movementKeys.left.pressed == false && movementKeys.up.pressed == true && movementKeys.down.pressed == false;
+	down_right_was_pressed = movementKeys.right.pressed == true && movementKeys.left.pressed == false && movementKeys.up.pressed == false && movementKeys.down.pressed == true;
+	up_left_was_pressed = movementKeys.right.pressed == false && movementKeys.left.pressed == true && movementKeys.up.pressed == true && movementKeys.down.pressed == false;
+	down_left_was_pressed = movementKeys.right.pressed == false && movementKeys.left.pressed == true && movementKeys.up.pressed == false && movementKeys.down.pressed == true;
+	no_directional_keys_pressed =
+		movementKeys.right.pressed == false && movementKeys.left.pressed == false && movementKeys.up.pressed == false && movementKeys.down.pressed == false;
+
 	//right
 	if (right_was_pressed) {
 		player.set_movement_state_to_right();
@@ -547,45 +475,87 @@ function adjust_player_y_velocity_based_on_player_y_position_and_direction_state
 	}
 }
 
-function update_player_directional_sprite_based_on_direction_state() {
-	//change to run right sprite
-	if (
-		(player.directionState.up == true ||
-			player.directionState.down == true ||
-			player.directionState.right == true ||
-			player.directionState.upRight == true ||
-			player.directionState.downRight == true) &&
-		lastKey == 'right' &&
-		player.currentSprite != player.sprites.run.right
-	) {
-		player.reset_frames_and_sprite_counter();
-		player.change_sprite_based_on_direction_input(player.sprites.run.right, 'right', player.sprites.run.cropWidth, player.sprites.run.width);
-	}
+function handle_player_directional_sprite_based_on_direction_state() {
+	if (JSON.stringify(player.directionState) !== JSON.stringify(player.lastDirectionState)) {
+		player.lastDirectionState = JSON.stringify(player.directionState);
 
-	//change to run left sprite
-	else if (
-		(player.directionState.up == true ||
-			player.directionState.down == true ||
-			player.directionState.left == true ||
-			player.directionState.upLeft == true ||
-			player.directionState.downLeft == true) &&
-		lastKey == 'left' &&
-		player.currentSprite != player.sprites.run.left
-	) {
-		player.reset_frames_and_sprite_counter();
-		player.change_sprite_based_on_direction_input(player.sprites.run.left, 'left', player.sprites.run.cropWidth, player.sprites.run.width);
-	}
+		//change to run right sprite
+		if (
+			(player.directionState.up == true ||
+				player.directionState.down == true ||
+				player.directionState.right == true ||
+				player.directionState.upRight == true ||
+				player.directionState.downRight == true) &&
+			lastKey == 'right' &&
+			player.currentSprite != player.sprites.run.right
+		) {
+			player.reset_frames_and_sprite_counter();
+			player.change_sprite_based_on_direction_input(player.sprites.run.right, 'right', player.sprites.run.cropWidth, player.sprites.run.width);
+		}
 
-	//change to idle left sprite
-	else if (player.directionState.stop == true && lastKey == 'left' && player.currentSprite != player.sprites.stand.left) {
-		player.reset_frames_and_sprite_counter();
-		player.change_sprite_based_on_direction_input(player.sprites.stand.left, 'left', player.sprites.stand.cropWidth, player.sprites.stand.width);
-	}
+		//change to run left sprite
+		else if (
+			(player.directionState.up == true ||
+				player.directionState.down == true ||
+				player.directionState.left == true ||
+				player.directionState.upLeft == true ||
+				player.directionState.downLeft == true) &&
+			lastKey == 'left' &&
+			player.currentSprite != player.sprites.run.left
+		) {
+			player.reset_frames_and_sprite_counter();
+			player.change_sprite_based_on_direction_input(player.sprites.run.left, 'left', player.sprites.run.cropWidth, player.sprites.run.width);
+		}
 
-	//change to idle right sprite
-	else if (player.directionState.stop == true && lastKey == 'right' && player.currentSprite != player.sprites.stand.right) {
-		player.reset_frames_and_sprite_counter();
-		player.change_sprite_based_on_direction_input(player.sprites.stand.right, 'right', player.sprites.stand.cropWidth, player.sprites.stand.width);
+		//change to idle left sprite
+		else if (player.directionState.stop == true && lastKey == 'left' && player.currentSprite != player.sprites.stand.left) {
+			player.reset_frames_and_sprite_counter();
+			player.change_sprite_based_on_direction_input(player.sprites.stand.left, 'left', player.sprites.stand.cropWidth, player.sprites.stand.width);
+		}
+
+		//change to idle right sprite
+		else if (player.directionState.stop == true && lastKey == 'right' && player.currentSprite != player.sprites.stand.right) {
+			player.reset_frames_and_sprite_counter();
+			player.change_sprite_based_on_direction_input(player.sprites.stand.right, 'right', player.sprites.stand.cropWidth, player.sprites.stand.width);
+		}
+	}
+}
+
+function handle_action_sprite_changes_based_on_action_state() {
+	switch (true) {
+		// player punching
+		case player.action.punch:
+			player.sound.punch.play();
+			player.sound.myVoice.play();
+			if (lastKey == 'right') {
+				player.update_player_action_sprite_based_on_action_state(player.sprites.punch.right, lastKey, player.sprites.punch.cropWidth, player.sprites.punch.width);
+			} else if (lastKey == 'left') {
+				player.update_player_action_sprite_based_on_action_state(player.sprites.punch.left, lastKey, player.sprites.punch.cropWidth, player.sprites.punch.width);
+			}
+			break;
+
+		// player biting
+		case player.action.bite:
+			player.sound.bite.play();
+			player.sound.dragon.play();
+			if (lastKey == 'right') {
+				player.update_player_action_sprite_based_on_action_state(player.sprites.bite.right, lastKey, player.sprites.bite.cropWidth, player.sprites.bite.width);
+			} else if (lastKey == 'left') {
+				player.update_player_action_sprite_based_on_action_state(player.sprites.bite.left, lastKey, player.sprites.bite.cropWidth, player.sprites.bite.width);
+			}
+			break;
+
+		// player swiping
+		case player.action.swipe:
+			player.sound.swipe.play();
+			player.sound.wetFart.play();
+			if (lastKey == 'right') {
+				player.reset_frames_and_sprite_counter();
+				player.update_player_action_sprite_based_on_action_state(player.sprites.swipe.right, lastKey, player.sprites.swipe.cropWidth, player.sprites.swipe.width);
+			} else if (lastKey == 'left') {
+				player.update_player_action_sprite_based_on_action_state(player.sprites.swipe.left, lastKey, player.sprites.swipe.cropWidth, player.sprites.swipe.width);
+			}
+			break;
 	}
 }
 
