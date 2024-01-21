@@ -1,21 +1,7 @@
-import platform from './img/platform.png';
-import tank1 from './img/tank-1.png';
-import tank2 from './img/tank-2.png';
-import tank3 from './img/tank-3.png';
-import back from './img/back.png';
-import support from './img/support.png';
-
-import spriteRunLeft from './img/spriteRunLeft.png';
-import spriteRunRight from './img/spriteRunRight.png';
-import spriteStandLeft from './img/spriteStandLeft.png';
-import spriteStandRight from './img/spriteStandRight.png';
-
-import GenericObject from './classes/genericObjects';
 import Player from './classes/player';
-import Platform from './classes/platform';
 
-import * as utils from './utils/index.js';
-import * as imageStuff from './img/index.js';
+import { stage, createStageBackgroundTiles, createStageItems } from './utils/stageStuff.js';
+
 const gravity = 1;
 
 // utils.canvasStuff.create2dCanvasContext(canvas, 'canvas', c, '2d');
@@ -23,6 +9,7 @@ const gravity = 1;
 const canvas = document.querySelector('canvas');
 const c = canvas.getContext('2d');
 
+//set the canvas to a set width and height
 canvas.width = 1024;
 canvas.height = 576;
 
@@ -32,50 +19,25 @@ console.log(canvas);
 c.fillStyle = 'white';
 c.fillRect(0, 0, canvas.width, canvas.height);
 
-export { canvas, c };
-//set the canvas to a set width and height
-
 console.log(c);
 
-//Image objects
-let platformImage = createImage(platform);
-let tank1Image = createImage(tank1);
-let tank2Image = createImage(tank2);
-let tank3Image = createImage(tank3);
-let backImage = createImage(back);
-let supportImage = createImage(support);
-
-//background image values
-let bgWidth = 800 * 1.5;
-let bgHeight = 600 * 1.5;
-
-//background tank values
-let bgTankWidth = tank1Image.width * 3;
-let bgTankHeight = tank1Image.height * 3;
-let bgTank1Distance = 2700;
-let bgTank2Distance = 1500;
-let bgTank3Distance = 10000;
-let supportDistance = 1200;
-
-//support beams values
-let supportWidth = supportImage.width * 3;
-let supportHeight = supportImage.height * 3;
-
-//Creates and returns the image objects
-function createImage(imageSrc) {
-	let image = new Image();
-	image.src = imageSrc;
-	return image;
-}
+let currentLevel = 1;
 
 //Class objects
 let player;
-let platforms = []; // what player stands on
 let stageBackgroundTiles = []; // parallex scrolled background and hills
-let stageBackgroundItems = []; // tanks n stuff
-let stageBackgroundItems2 = []; // more tanks
-let stageBackgroundItems3 = []; // even more tanks
+let stageBackgroundItems = []; // human tanks
 let stageForegroundItems = []; //  support beams
+let closeBgItems = [];
+let farBgItems = [];
+let veryFarBgItems = [];
+let horizonBgItems = [];
+
+let foregroundParallexRate = 5;
+let stageParallexRate = 0.66;
+let closeBgParallexRate = 0.5;
+let farBgParallexRate = 0.35;
+let veryFarParallexRate = 0.2;
 
 // button states
 let lastKey = 'right';
@@ -93,17 +55,6 @@ let movementKeys = {
 		pressed: false,
 	},
 };
-
-//movement key condition vairables. They need to be public
-let right_was_pressed;
-let left_was_pressed;
-let up_was_pressed;
-let down_was_pressed;
-let up_right_was_pressed;
-let down_right_was_pressed;
-let up_left_was_pressed;
-let down_left_was_pressed;
-let no_directional_keys_pressed;
 
 let actionKeys = {
 	space: {
@@ -138,35 +89,39 @@ function init() {
 
 	/*************************helper functions*****************************/
 	function create_game_objects() {
+		//player object
 		player = new Player();
-		platforms = [
-			// accepts x,y,image
-			new Platform(-1, 470, platformImage), // first standing platform
-			new Platform(platformImage.width, 470, platformImage), // 2nd platform with x-positiion set 1 platform width away from the origin
-			new Platform(platformImage.width * 2, 470, platformImage), // 3rd platform with x-position set 2 platform widths + 100 px away from the origin to create a death pit
-			new Platform(platformImage.width * 3, 470, platformImage), // 4th platform with x-position set 3 platform widths + 300 px away from the origin
-			new Platform(platformImage.width * 4, 470, platformImage), // 5th platform with x-position set 4 platform widths + 300 px away from the origin
-			new Platform(platformImage.width * 5, 470, platformImage), // 6th platform with x-position set 4 platform widths + 300 px away from the origin
-			new Platform(platformImage.width * 6, 470, platformImage), // 7th platform with x-position set 4 platform widths + 300 px away from the origin
-			new Platform(platformImage.width * 7, 470, platformImage), // 8th platform with x-position set 4 platform widths + 300 px away from the origin
-		];
-		stageBackgroundTiles = utils.stageStuff.createStageBackgroundTiles(15, -320, bgWidth, bgHeight, backImage);
-		stageForegroundItems = utils.stageStuff.createStageItems(10, 50, 0, supportDistance, supportWidth, supportHeight, supportImage);
-		//tank 1
-		stageBackgroundItems = utils.stageStuff.createStageItems(10, bgTank1Distance, canvas.height - 595, bgTank1Distance, bgTankWidth, bgTankHeight, tank1Image);
-		//tank2
-		stageBackgroundItems2 = utils.stageStuff.createStageItems(10, bgTank2Distance, canvas.height - 595, bgTank2Distance, bgTankWidth, bgTankHeight, tank2Image);
-		//tank 3
-		stageBackgroundItems3 = utils.stageStuff.createStageItems(10, bgTank3Distance, canvas.height - 595, bgTank3Distance, bgTankWidth, bgTankHeight, tank3Image);
-		// stageBackgroundItems3 = utils.stageStuff.createStageItems(
-		// 	10,
-		// 	imageStuff.bgItems.darkBgItems.darkTank.x_gap,
-		// 	imageStuff.bgItems.darkBgItems.darkTank.y,
-		// 	imageStuff.bgItems.darkBgItems.darkTank.x_gap,
-		// 	imageStuff.bgItems.darkBgItems.darkTank.width,
-		// 	imageStuff.bgItems.darkBgItems.darkTank.height,
-		// 	imageStuff.bgItems.darkBgItems.darkTank.image
-		// );
+
+		//stage objects
+
+		stage[currentLevel].foregroundItems?.forEach((item, index) => {
+			// foreground items
+			stageForegroundItems[index] = createStageItems(item.numberOfItems, item.firstItemX, item.y, item.spacing, item.width, item.height, item.image);
+		});
+		stage[currentLevel].bgTiles?.forEach((item, index) => {
+			// stage tiles
+			stageBackgroundTiles[index] = createStageBackgroundTiles(item.numberOfItems, item.y, item.width, item.height, item.image);
+		});
+		stage[currentLevel].bgItems?.forEach((item, index) => {
+			// stage background itmes
+			stageBackgroundItems[index] = createStageItems(item.numberOfItems, item.firstItemX, item.y, item.spacing, item.width, item.height, item.image);
+		});
+		stage[currentLevel].closeBgItems?.forEach((item, index) => {
+			// close bg items
+			closeBgItems[index] = createStageItems(item.numberOfItems, item.firstItemX, item.y, item.spacing, item.width, item.height, item.image);
+		});
+		stage[currentLevel].farBgItems?.forEach((item, index) => {
+			// far bg items
+			farBgItems[index] = createStageItems(item.numberOfItems, item.firstItemX, item.y, item.spacing, item.width, item.height, item.image);
+		});
+		stage[currentLevel].veryFarBgItems?.forEach((item, index) => {
+			// very far bg items
+			veryFarBgItems[index] = createStageItems(item.numberOfItems, item.firstItemX, item.y, item.spacing, item.width, item.height, item.image);
+		});
+		stage[currentLevel].horizonBgItems?.forEach((item, index) => {
+			// still horizon items
+			horizonBgItems[index] = createStageItems(item.numberOfItems, item.firstItemX, item.y, item.spacing, item.width, item.height, item.image);
+		});
 	}
 }
 
@@ -180,25 +135,36 @@ function animate() {
 
 	//drawing items
 	const drawItems = (items) => {
-		items.forEach((item) => {
+		items?.forEach((item) => {
 			item.draw();
 		});
 	};
 
-	//draw background tiles
-	drawItems(stageBackgroundTiles);
-	//draw tank1 tanks
-	drawItems(stageBackgroundItems);
-	//draw tank2 tanks
-	drawItems(stageBackgroundItems2);
-	//draw tank3 tanks
-	drawItems(stageBackgroundItems3);
+	veryFarBgItems?.forEach((typeOfVeryFarBgItem) => {
+		drawItems(typeOfVeryFarBgItem);
+	});
+	horizonBgItems?.forEach((typeOfHorizonBgItem) => {
+		drawItems(typeOfHorizonBgItem);
+	});
+	farBgItems?.forEach((typeOfFarBgItem) => {
+		drawItems(typeOfFarBgItem);
+	});
+	closeBgItems?.forEach((typeOfCloseBgItem) => {
+		drawItems(typeOfCloseBgItem);
+	});
+	stageBackgroundTiles?.forEach((typeOfStageTile) => {
+		drawItems(typeOfStageTile);
+	});
+	stageBackgroundItems?.forEach((typeOfStageBgItem) => {
+		drawItems(typeOfStageBgItem);
+	});
 
 	//upadate the player spite frame number and crop position, then draws the sprite onto the screen, then updates its positon value
 	player.update();
 
-	//draw the support beams
-	drawItems(stageForegroundItems);
+	stageForegroundItems?.forEach((typeOfForegroundItem) => {
+		drawItems(typeOfForegroundItem);
+	});
 
 	/*************** action states ************/
 	update_player_action_state_based_on_button_presses();
@@ -223,7 +189,7 @@ function animate() {
 	}
 
 	//win scenario
-	if ((scrollOffset > platformImage.width * 5 + 400 - 2, 470)) {
+	if (scrollOffset > stage[currentLevel].endOfStageX) {
 		//console.log('you win');
 	}
 
@@ -253,15 +219,17 @@ function update_player_action_state_based_on_button_presses() {
 
 function update_player_direction_state_based_on_button_presses() {
 	//movement condtions placed in loop to register button presses
-	right_was_pressed = movementKeys.right.pressed == true && movementKeys.left.pressed == false && movementKeys.up.pressed == false && movementKeys.down.pressed == false;
-	left_was_pressed = movementKeys.right.pressed == false && movementKeys.left.pressed == true && movementKeys.up.pressed == false && movementKeys.down.pressed == false;
-	up_was_pressed = movementKeys.right.pressed == false && movementKeys.left.pressed == false && movementKeys.up.pressed == true && movementKeys.down.pressed == false;
-	down_was_pressed = movementKeys.right.pressed == false && movementKeys.left.pressed == false && movementKeys.up.pressed == false && movementKeys.down.pressed == true;
-	up_right_was_pressed = movementKeys.right.pressed == true && movementKeys.left.pressed == false && movementKeys.up.pressed == true && movementKeys.down.pressed == false;
-	down_right_was_pressed = movementKeys.right.pressed == true && movementKeys.left.pressed == false && movementKeys.up.pressed == false && movementKeys.down.pressed == true;
-	up_left_was_pressed = movementKeys.right.pressed == false && movementKeys.left.pressed == true && movementKeys.up.pressed == true && movementKeys.down.pressed == false;
-	down_left_was_pressed = movementKeys.right.pressed == false && movementKeys.left.pressed == true && movementKeys.up.pressed == false && movementKeys.down.pressed == true;
-	no_directional_keys_pressed =
+	let right_was_pressed = movementKeys.right.pressed == true && movementKeys.left.pressed == false && movementKeys.up.pressed == false && movementKeys.down.pressed == false;
+	let left_was_pressed = movementKeys.right.pressed == false && movementKeys.left.pressed == true && movementKeys.up.pressed == false && movementKeys.down.pressed == false;
+	let up_was_pressed = movementKeys.right.pressed == false && movementKeys.left.pressed == false && movementKeys.up.pressed == true && movementKeys.down.pressed == false;
+	let down_was_pressed = movementKeys.right.pressed == false && movementKeys.left.pressed == false && movementKeys.up.pressed == false && movementKeys.down.pressed == true;
+	let up_right_was_pressed = movementKeys.right.pressed == true && movementKeys.left.pressed == false && movementKeys.up.pressed == true && movementKeys.down.pressed == false;
+	let down_right_was_pressed =
+		movementKeys.right.pressed == true && movementKeys.left.pressed == false && movementKeys.up.pressed == false && movementKeys.down.pressed == true;
+	let up_left_was_pressed = movementKeys.right.pressed == false && movementKeys.left.pressed == true && movementKeys.up.pressed == true && movementKeys.down.pressed == false;
+	let down_left_was_pressed =
+		movementKeys.right.pressed == false && movementKeys.left.pressed == true && movementKeys.up.pressed == false && movementKeys.down.pressed == true;
+	let no_directional_keys_pressed =
 		movementKeys.right.pressed == false && movementKeys.left.pressed == false && movementKeys.up.pressed == false && movementKeys.down.pressed == false;
 
 	//right
@@ -335,140 +303,259 @@ function update_player_direction_state_based_on_button_presses() {
 		player.step.one == false;
 	}
 }
-
 function adjust_player_x_velocity_and_background_and_foreground_based_on_player_x_position_and_direction_states() {
-	if (player.directionState.right == true && player.position.x < 50) {
-		player.move_right_full_speed();
-	} else if ((player.directionState.upRight == true || player.directionState.downRight == true) && player.position.x < 50) {
-		player.move_right_half_speed();
-	} else if ((player.directionState.left == true && player.position.x > -100) || (player.directionState.left == true && scrollOffset == 0 && player.position.x > -380)) {
-		player.move_left_full_speed();
-	} else if (
-		((player.directionState.upLeft == true || player.directionState.downLeft == true) && player.position.x > -100) ||
-		((player.directionState.upLeft == true || player.directionState.downLeft == true) && scrollOffset == 0 && player.position.x > -380)
-	) {
-		player.move_left_half_speed();
-	} else if (
+	//console.log('scroll offset', scrollOffset);
+	let player_is_moving_right_and_hasnt_reached_its_far_right_edge = player.directionState.right == true && player.position.x < player.position.farRightEdge;
+
+	let player_is_moving_angled_right_and_hasnt_reached_its_far_right_edge =
+		(player.directionState.upRight == true || player.directionState.downRight == true) && player.position.x < player.position.farRightEdge;
+
+	let player_is_moving_left_while_offset_and_hasnt_reached_its_far_left_edge =
+		player.directionState.left == true && player.position.x > player.position.leftEdgeWhileOffsetted;
+
+	let player_is_moving_left_while_NOT_offset_and_hasnt_reached_its_far_left_edge_of_the_screen =
+		player.directionState.left == true && scrollOffset == 0 && player.position.x > player.position.leftEdgeWithNoOffset;
+
+	let player_is_moving_angled_left_while_offset_and_hasnt_reached_its_far_left_edge =
+		(player.directionState.upLeft == true || player.directionState.downLeft == true) && player.position.x > player.position.leftEdgeWhileOffsetted;
+
+	let player_is_moving_left_angled_while_NOT_offset_and_hasnt_reached_its_far_left_edge_of_the_screen =
+		(player.directionState.upLeft == true || player.directionState.downLeft == true) && scrollOffset == 0 && player.position.x > player.position.leftEdgeWithNoOffset;
+
+	let player_isnt_moving_left_or_right =
 		player.directionState.right == false &&
 		player.directionState.upRight == false &&
 		player.directionState.downRight == false &&
 		player.directionState.left == false &&
 		player.directionState.upLeft == false &&
-		player.directionState.downLeft == false
+		player.directionState.downLeft == false;
+
+	/*********************************** logic starts here********************************/
+	if (player_is_moving_right_and_hasnt_reached_its_far_right_edge) {
+		player.move_right_full_speed();
+	} else if (player_is_moving_angled_right_and_hasnt_reached_its_far_right_edge) {
+		player.move_right_half_speed();
+	} else if (
+		player_is_moving_left_while_offset_and_hasnt_reached_its_far_left_edge ||
+		player_is_moving_left_while_NOT_offset_and_hasnt_reached_its_far_left_edge_of_the_screen
 	) {
+		player.move_left_full_speed();
+	} else if (
+		player_is_moving_angled_left_while_offset_and_hasnt_reached_its_far_left_edge ||
+		player_is_moving_left_angled_while_NOT_offset_and_hasnt_reached_its_far_left_edge_of_the_screen
+	) {
+		player.move_left_half_speed();
+	} else if (player_isnt_moving_left_or_right) {
 		player.stop_horizontal_movement();
 	} else {
 		player.stop_horizontal_movement();
 		if (player.directionState.right == true) {
-			//console.log('scroll offset', scrollOffset);
-			scrollOffset += player.speed;
-			platforms.forEach((platform) => {
-				platform.position.x -= player.speed;
-			});
-			stageForegroundItems.forEach((beam) => {
-				beam.position.x -= player.speed;
-			});
-			stageBackgroundItems.forEach((item) => {
-				item.position.x -= player.speed * 0.66;
-			});
-			stageBackgroundItems2.forEach((item) => {
-				item.position.x -= player.speed * 0.66;
-			});
-			stageBackgroundItems3.forEach((item) => {
-				item.position.x -= player.speed * 0.66;
-			});
-			stageBackgroundTiles.forEach((background) => {
-				background.position.x -= player.speed * 0.66; // move the background hills a little slower than everything else
-			});
+			move_the_stage_objects_left_full_speed();
 		} else if (player.directionState.upRight == true || player.directionState.downRight == true) {
-			scrollOffset += player.speed / 2;
-			stageBackgroundItems.forEach((item) => {
-				item.position.x -= (player.speed * 0.66) / 2;
-			});
-			stageBackgroundItems2.forEach((item) => {
-				item.position.x -= (player.speed * 0.66) / 2;
-			});
-			stageBackgroundItems3.forEach((item) => {
-				item.position.x -= (player.speed * 0.66) / 2;
-			});
-			platforms.forEach((platform) => {
-				platform.position.x -= player.speed / 2;
-			});
-			stageForegroundItems.forEach((beam) => {
-				beam.position.x -= player.speed / 2;
-			});
-			stageBackgroundTiles.forEach((background) => {
-				background.position.x -= (player.speed * 0.66) / 2; // move the background hills a little slower than everything else
-			});
+			move_the_stage_objects_left_halfspeed();
 		} else if (player.directionState.left == true && scrollOffset > 0) {
-			//console.log('scroll offset', scrollOffset);
-			scrollOffset -= player.speed;
-			stageBackgroundItems.forEach((item) => {
-				item.position.x += player.speed * 0.66;
-			});
-			stageBackgroundItems2.forEach((item) => {
-				item.position.x += player.speed * 0.66;
-			});
-			stageBackgroundItems3.forEach((item) => {
-				item.position.x += player.speed * 0.66;
-			});
-			platforms.forEach((platform) => {
-				platform.position.x += player.speed;
-			});
-			stageForegroundItems.forEach((beam) => {
-				beam.position.x += player.speed;
-			});
-
-			stageBackgroundTiles.forEach((background) => {
-				background.position.x += player.speed * 0.66; // move the background hills a little slower than everything else
-			});
+			move_the_stage_objects_right_full_speed();
 		} else if ((player.directionState.upLeft == true || player.directionState.downLeft == true) && scrollOffset > 0) {
-			scrollOffset -= player.speed / 2;
-			stageBackgroundItems.forEach((item) => {
-				item.position.x += (player.speed * 0.66) / 2;
-			});
-			stageBackgroundItems2.forEach((item) => {
-				item.position.x += (player.speed * 0.66) / 2;
-			});
-			stageBackgroundItems3.forEach((item) => {
-				item.position.x += (player.speed * 0.66) / 2;
-			});
-			platforms.forEach((platform) => {
-				platform.position.x += player.speed / 2;
-			});
-			stageForegroundItems.forEach((beam) => {
-				beam.position.x += player.speed / 2;
-			});
-			stageBackgroundTiles.forEach((background) => {
-				background.position.x += (player.speed * 0.66) / 2; // move the background hills a little slower than everything else
+			move_the_stage_objects_right_half_speed();
+		}
+	}
+
+	///////////////////////////////////////////////////////////// helper functions
+	function move_the_stage_objects_left_full_speed() {
+		scrollOffset += player.speed;
+
+		//very far background items
+		for (let i = 0; i < veryFarBgItems.length; i++) {
+			veryFarBgItems[i]?.forEach((item) => {
+				item.position.x -= player.speed * veryFarParallexRate;
 			});
 		}
+		//far background items
+		for (let i = 0; i < farBgItems.length; i++) {
+			farBgItems[i]?.forEach((item) => {
+				item.position.x -= player.speed * farBgParallexRate;
+			});
+		}
+		//close background items
+		for (let i = 0; i < closeBgItems.length; i++) {
+			closeBgItems[i]?.forEach((item) => {
+				item.position.x -= player.speed * closeBgParallexRate;
+			});
+		}
+		//background items
+		for (let i = 0; i < stageBackgroundItems.length; i++) {
+			stageBackgroundItems[i]?.forEach((item) => {
+				item.position.x -= player.speed * stageParallexRate;
+			});
+		}
+		//stage background tiles
+		for (let i = 0; i < stageBackgroundTiles.length; i++) {
+			stageBackgroundTiles[i]?.forEach((item) => {
+				item.position.x -= player.speed * stageParallexRate;
+			});
+		}
+		//foreground items
+		for (let i = 0; i < stageForegroundItems.length; i++) {
+			stageForegroundItems[i]?.forEach((item) => {
+				item.position.x -= player.speed;
+			});
+		}
+	}
+
+	function move_the_stage_objects_left_halfspeed() {
+		scrollOffset += player.speed / 2;
+
+		//very far background items
+		veryFarBgItems.forEach((group) => {
+			group?.forEach((item) => {
+				item.position.x -= (player.speed * veryFarParallexRate) / 2;
+			});
+		});
+		//far background items
+		farBgItems.forEach((group) => {
+			group?.forEach((item) => {
+				item.position.x -= (player.speed * farBgParallexRate) / 2;
+			});
+		});
+		//close background items
+		closeBgItems.forEach((group) => {
+			group?.forEach((item) => {
+				item.position.x -= (player.speed * closeBgParallexRate) / 2;
+			});
+		});
+		//background items
+		stageBackgroundItems.forEach((group) => {
+			group?.forEach((item) => {
+				item.position.x -= (player.speed * stageParallexRate) / 2;
+			});
+		});
+		//stage background tiles
+		stageBackgroundTiles.forEach((group) => {
+			group?.forEach((item) => {
+				item.position.x -= (player.speed * stageParallexRate) / 2;
+			});
+		});
+		//foreground items
+		stageForegroundItems.forEach((group) => {
+			group?.forEach((item) => {
+				item.position.x -= player.speed / 2;
+			});
+		});
+	}
+
+	function move_the_stage_objects_right_full_speed() {
+		scrollOffset -= player.speed;
+
+		//very far background items
+		veryFarBgItems.forEach((group) => {
+			group?.forEach((item) => {
+				item.position.x += player.speed * veryFarParallexRate;
+			});
+		});
+		//far background items
+		farBgItems.forEach((group) => {
+			group?.forEach((item) => {
+				item.position.x += player.speed * farBgParallexRate;
+			});
+		});
+		//close background items
+		closeBgItems.forEach((group) => {
+			group?.forEach((item) => {
+				item.position.x += player.speed * closeBgParallexRate;
+			});
+		});
+		//background items
+		stageBackgroundItems.forEach((group) => {
+			group?.forEach((item) => {
+				item.position.x += player.speed * stageParallexRate;
+			});
+		});
+		//background tiles
+		stageBackgroundTiles.forEach((group) => {
+			group?.forEach((item) => {
+				item.position.x += player.speed * stageParallexRate;
+			});
+		});
+		//foreground items
+		stageForegroundItems.forEach((group) => {
+			group?.forEach((item) => {
+				item.position.x += player.speed;
+			});
+		});
+	}
+
+	function move_the_stage_objects_right_half_speed() {
+		scrollOffset -= player.speed / 2;
+
+		//very far background items
+		veryFarBgItems.forEach((group) => {
+			group?.forEach((item) => {
+				item.position.x += (player.speed * veryFarParallexRate) / 2;
+			});
+		});
+		//far background items
+		farBgItems.forEach((group) => {
+			group?.forEach((item) => {
+				item.position.x += (player.speed * farBgParallexRate) / 2;
+			});
+		});
+		//close background items
+		closeBgItems.forEach((group) => {
+			group?.forEach((item) => {
+				item.position.x += (player.speed * closeBgParallexRate) / 2;
+			});
+		});
+		//background items
+		stageBackgroundItems.forEach((group) => {
+			group?.forEach((item) => {
+				item.position.x += (player.speed * stageParallexRate) / 2;
+			});
+		});
+		//background tiles
+		stageBackgroundTiles.forEach((group) => {
+			group?.forEach((item) => {
+				item.position.x += (player.speed * stageParallexRate) / 2;
+			});
+		});
+		//foregroung items
+		stageForegroundItems.forEach((group) => {
+			group?.forEach((item) => {
+				item.position.x += player.speed / 2;
+			});
+		});
 	}
 }
 
 function adjust_player_y_velocity_based_on_player_y_position_and_direction_states() {
-	if (player.directionState.up == true && player.position.y >= canvas.height - 480) {
-		player.move_up_full_speed();
-
-		// console.log('go up. Player position :', player.position);
-	} else if ((player.directionState.upRight == true || player.directionState.upLeft == true) && player.position.y >= canvas.height - 480) {
-		player.move_up_half_speed();
-
-		// console.log('go angled up. Player position :', player.position);
-	} else if (player.directionState.down == true && player.position.y + player.height - 290 <= canvas.height) {
-		player.move_down_full_speed();
-		// console.log('go down. Player position :', player.position);
-	} else if ((player.directionState.downRight == true || player.directionState.downLeft == true) && player.position.y + player.height - 290 <= canvas.height) {
-		player.move_down_half_speed();
-		// console.log('go angled down. Player position :', player.position);
-	} else if (
+	///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+	let player_is_moving_up_and_hasnt_reached_its_top_border = player.directionState.up == true && player.position.y >= canvas.height - 480;
+	let player_is_moving_angled_up_and_hasnt_reached_its_top_border =
+		(player.directionState.upRight == true || player.directionState.upLeft == true) && player.position.y >= canvas.height - 480;
+	let player_is_moving_down_and_hasnt_reached_its_bottom_border = player.directionState.down == true && player.position.y + player.height - 290 <= canvas.height;
+	let player_is_moving_angled_down_and_hasnt_reached_its_bottom_border =
+		(player.directionState.downRight == true || player.directionState.downLeft == true) && player.position.y + player.height - 290 <= canvas.height;
+	let player_isnt_moving =
 		player.directionState.up == false &&
 		player.directionState.upRight == false &&
 		player.directionState.upLeft == false &&
 		player.directionState.down == false &&
 		player.directionState.downRight == false &&
-		player.directionState.downLeft == false
-	) {
+		player.directionState.downLeft == false;
+
+	/*********************************** logic starts here********************************/
+	if (player_is_moving_up_and_hasnt_reached_its_top_border) {
+		player.move_up_full_speed();
+		// console.log('go up. Player position :', player.position);
+	} else if (player_is_moving_angled_up_and_hasnt_reached_its_top_border) {
+		player.move_up_half_speed();
+		// console.log('go angled up. Player position :', player.position);
+	} else if (player_is_moving_down_and_hasnt_reached_its_bottom_border) {
+		player.move_down_full_speed();
+		// console.log('go down. Player position :', player.position);
+	} else if (player_is_moving_angled_down_and_hasnt_reached_its_bottom_border) {
+		player.move_down_half_speed();
+		// console.log('go angled down. Player position :', player.position);
+	} else if (player_isnt_moving) {
 		player.stop_vertical_movement();
 	} else {
 		player.stop_vertical_movement();
@@ -476,45 +563,52 @@ function adjust_player_y_velocity_based_on_player_y_position_and_direction_state
 }
 
 function handle_player_directional_sprite_based_on_direction_state() {
-	if (JSON.stringify(player.directionState) !== JSON.stringify(player.lastDirectionState)) {
+	let player_Direction_Has_Changed = JSON.stringify(player.directionState) !== JSON.stringify(player.lastDirectionState);
+	let player_is_moving_up_down_or_right_and_facing_right_and_sprite_isnt_showing_run_right =
+		(player.directionState.up == true ||
+			player.directionState.down == true ||
+			player.directionState.right == true ||
+			player.directionState.upRight == true ||
+			player.directionState.downRight == true) &&
+		lastKey == 'right' &&
+		player.currentSprite != player.sprites.run.right;
+	let player_is_moving_up_down_or_left_and_facing_left_and_sprite_isnt_showing_run_left =
+		(player.directionState.up == true ||
+			player.directionState.down == true ||
+			player.directionState.left == true ||
+			player.directionState.upLeft == true ||
+			player.directionState.downLeft == true) &&
+		lastKey == 'left' &&
+		player.currentSprite != player.sprites.run.left;
+	let player_has_stopped_and_facing_left_and_sprite_not_showing_idle_left =
+		player.directionState.stop == true && lastKey == 'left' && player.currentSprite != player.sprites.stand.left;
+	let player_has_stopped_and_facing_right_and_sprite_not_showing_idle_right =
+		player.directionState.stop == true && lastKey == 'right' && player.currentSprite != player.sprites.stand.right;
+
+	/*********************************** logic starts here********************************/
+	if (player_Direction_Has_Changed) {
 		player.lastDirectionState = JSON.stringify(player.directionState);
 
 		//change to run right sprite
-		if (
-			(player.directionState.up == true ||
-				player.directionState.down == true ||
-				player.directionState.right == true ||
-				player.directionState.upRight == true ||
-				player.directionState.downRight == true) &&
-			lastKey == 'right' &&
-			player.currentSprite != player.sprites.run.right
-		) {
+		if (player_is_moving_up_down_or_right_and_facing_right_and_sprite_isnt_showing_run_right) {
 			player.reset_frames_and_sprite_counter();
 			player.change_sprite_based_on_direction_input(player.sprites.run.right, 'right', player.sprites.run.cropWidth, player.sprites.run.width);
 		}
 
 		//change to run left sprite
-		else if (
-			(player.directionState.up == true ||
-				player.directionState.down == true ||
-				player.directionState.left == true ||
-				player.directionState.upLeft == true ||
-				player.directionState.downLeft == true) &&
-			lastKey == 'left' &&
-			player.currentSprite != player.sprites.run.left
-		) {
+		else if (player_is_moving_up_down_or_left_and_facing_left_and_sprite_isnt_showing_run_left) {
 			player.reset_frames_and_sprite_counter();
 			player.change_sprite_based_on_direction_input(player.sprites.run.left, 'left', player.sprites.run.cropWidth, player.sprites.run.width);
 		}
 
 		//change to idle left sprite
-		else if (player.directionState.stop == true && lastKey == 'left' && player.currentSprite != player.sprites.stand.left) {
+		else if (player_has_stopped_and_facing_left_and_sprite_not_showing_idle_left) {
 			player.reset_frames_and_sprite_counter();
 			player.change_sprite_based_on_direction_input(player.sprites.stand.left, 'left', player.sprites.stand.cropWidth, player.sprites.stand.width);
 		}
 
 		//change to idle right sprite
-		else if (player.directionState.stop == true && lastKey == 'right' && player.currentSprite != player.sprites.stand.right) {
+		else if (player_has_stopped_and_facing_right_and_sprite_not_showing_idle_right) {
 			player.reset_frames_and_sprite_counter();
 			player.change_sprite_based_on_direction_input(player.sprites.stand.right, 'right', player.sprites.stand.cropWidth, player.sprites.stand.width);
 		}
@@ -561,7 +655,7 @@ function handle_action_sprite_changes_based_on_action_state() {
 
 // add event listeners for the keys. specify as a string what event is getting called
 window.addEventListener('keydown', (event) => {
-	console.log(event);
+	// console.log(event);
 	switch (event.key) {
 		case 'ArrowUp':
 			//console.log('up');
@@ -648,17 +742,17 @@ window.addEventListener('keyup', (event) => {
 			break;
 
 		case ' ':
-			console.log('space');
+			// console.log('space');
 			actionKeys.space.pressed = false;
 			break;
 
 		case 'b':
-			console.log('space');
+			// console.log('space');
 			actionKeys.b.pressed = false;
 			break;
 
 		case 's':
-			console.log('space');
+			// console.log('space');
 			actionKeys.s.pressed = false;
 			break;
 	}

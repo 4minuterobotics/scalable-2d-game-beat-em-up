@@ -48,6 +48,9 @@ class Player {
 		this.position = {
 			x: -300,
 			y: canvas.height - 400,
+			farRightEdge: 50,
+			leftEdgeWhileOffsetted: -100,
+			leftEdgeWithNoOffset: -380,
 		};
 		this.velocity = {
 			x: 0,
