@@ -1,20 +1,21 @@
+// import spriteWalkLeft from '../img/character-sprites/neil/walk-left-sprite.png';
 import spriteWalkLeft from '../img/character-sprites/neil/walk-left-sprite.png';
 import spriteWalkRight from '../img/character-sprites/neil/walk-right-sprite.png';
-import spriteIdleLeft from '../img/character-sprites/idle-left-sprite.png';
-import spriteIdleRight from '../img/character-sprites/idle-right-sprite.png';
+import spriteIdleLeft from '../img/character-sprites/neil/idle-left-sprite.png';
+import spriteIdleRight from '../img/character-sprites/neil/idle-right-sprite.png';
 
 import wassupMp3File from '../sounds/neil-wassup.mp3';
 import wheresYourIdMp3File from '../sounds/neil-wheres-your-id.mp3';
 
-import * as utils from '../utils/index.js';
+// import * as utils from '../utils/index.js';
 
 import { Howl, Howler } from 'howler'; // for audio
 
-//these variables store the image objects
-let playerStandLeftImage = createImage(spriteStandLeft);
-let playerStandRightImage = createImage(spriteStandRight);
-let playerRunLeftImage = createImage(spriteRunLeft);
-let playerRunRightImage = createImage(spriteRunRight);
+// //these variables store the image objects
+// let playerStandLeftImage = createImage(spriteIdleLeft);
+// let playerStandRightImage = createImage(spriteIdleRight);
+// let playerRunLeftImage = createImage(spriteRunLeft);
+// let playerRunRightImage = createImage(spriteRunRight);
 
 //this variable should hold the value of the width of each individually cropped sprite image
 const INDIVIDUAL_SPRITE_WIDTH = 200;
@@ -23,10 +24,10 @@ const canvas = document.querySelector('canvas');
 const c = canvas.getContext('2d');
 const gravity = 1;
 
-/*****Player class ******/
+/*****Enemy class ******/
 class Enemy {
 	constructor() {
-		//the player properties
+		//the enemy properties
 		this.position = {
 			x: 300,
 			y: canvas.height - 200,
@@ -347,25 +348,25 @@ class Enemy {
 		this.increment_frames_and_sprite_counter();
 
 		//stop the starting animation after 20 frames and reset the frames
-		if (this.spriteCounter == this.sprites.start.images && this.startAnimation == true) {
-			this.startAnimation = false;
-			this.reset_frames_and_sprite_counter();
-			this.change_current_sprite_image(this.sprites.stand.right);
-		}
+		// if (this.spriteCounter == this.sprites.start.images && this.startAnimation == true) {
+		// 	this.startAnimation = false;
+		// 	this.reset_frames_and_sprite_counter();
+		// 	this.change_current_sprite_image(this.sprites.stand.right);
+		// }
 
 		//cycled through standing images
-		else if (this.spriteCounter == this.sprites.stand.images && (this.currentSprite == this.sprites.stand.right || this.currentSprite == this.sprites.stand.left)) {
+		if (this.spriteCounter == this.sprites.stand.images && (this.currentSprite == this.sprites.stand.right || this.currentSprite == this.sprites.stand.left)) {
 			this.reset_frames_and_sprite_counter();
 		}
 
 		//player halfway through running images
-		else if (
-			this.spriteCounter == this.sprites.run.images / 2 &&
-			this.step.two == false &&
-			(this.currentSprite == this.sprites.run.right || this.currentSprite == this.sprites.run.left)
-		) {
-			this.play_second_footStep();
-		}
+		// else if (
+		// 	this.spriteCounter == this.sprites.run.images / 2 &&
+		// 	this.step.two == false &&
+		// 	(this.currentSprite == this.sprites.run.right || this.currentSprite == this.sprites.run.left)
+		// ) {
+		// 	this.play_second_footStep();
+		// }
 
 		//player cycled through running images
 		else if (this.spriteCounter == this.sprites.run.images && (this.currentSprite == this.sprites.run.right || this.currentSprite == this.sprites.run.left)) {
@@ -432,4 +433,4 @@ function createSound(audioSrc) {
 	return audio;
 }
 
-export default Player;
+export default Enemy;

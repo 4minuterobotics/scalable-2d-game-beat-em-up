@@ -1,18 +1,8 @@
 import GenericObject from '../classes/genericObjects';
-// import stages from '../img/index.js';
 import stages from '../img/stages/stageImages';
 import bgItems from '../img/bgItems/bgItems.js';
 import foregroundItems from '../img/foregroundItems/foregroundItems';
 
-//setting the x and y to -1 gets rid of the white edges.
-export function createStageBackgroundTiles(number_of_tiles, y, width, height, img) {
-	let arr = [];
-	for (let i = 0; i < number_of_tiles; i++) {
-		let tile = new GenericObject(width * i - 1, y, width, height, img);
-		arr.push(tile);
-	}
-	return arr;
-}
 export function createStageItems(number_of_items, first_item_x, y, gap, width, height, img) {
 	let arr = [];
 	for (let i = 0; i < number_of_items; i++) {
@@ -24,7 +14,7 @@ export function createStageItems(number_of_items, first_item_x, y, gap, width, h
 
 export let stage = [
 	{
-		// stage 1, index 0
+		// stage 1: alien space ship, index 0
 		foregroundItems: [
 			{
 				description: 'blue beams, kinda look metal',
@@ -41,7 +31,9 @@ export let stage = [
 			{
 				description: 'blue pipes, gloomy and dark',
 				numberOfItems: 15,
+				firstItemX: 0,
 				y: -320,
+				spacing: 800 * 1.5,
 				width: 800 * 1.5,
 				height: 600 * 1.5,
 				image: stages.alienSpaceShip.image,
@@ -84,7 +76,7 @@ export let stage = [
 	},
 
 	{
-		//stage 2, index 1
+		//stage 2: south beach, index 1
 		foregroundItems: [
 			{
 				description: 'individual palm trees',
@@ -101,7 +93,9 @@ export let stage = [
 			{
 				description: 'pink miami street',
 				numberOfItems: 15,
+				firstItemX: 0,
 				y: -380,
+				spacing: 800 * 1.6,
 				width: 800 * 1.6,
 				height: 600 * 1.6,
 				image: stages.miamiStreet.image,
@@ -155,6 +149,102 @@ export let stage = [
 				image: bgItems.horizonMotionless.light.pinkMiamiSun,
 			},
 		],
+		endOfStageX: 24000,
+	},
+	{
+		//stage 3: tijuana, index 2
+
+		bgTiles: [
+			{
+				description: 'active tijuana looking street',
+				numberOfItems: 15,
+				firstItemX: 0,
+				y: -270,
+				spacing: stages.activeTijuana.image.width * 2.8 * 2,
+				width: stages.activeTijuana.image.width * 2.8,
+				height: stages.activeTijuana.image.height * 2.8,
+				image: stages.activeTijuana.image,
+			},
+			{
+				description: 'empty tijuana looking street',
+				numberOfItems: 15,
+				firstItemX: stages.emptyTijuana.image.width * 2.8,
+				y: -270,
+				spacing: stages.emptyTijuana.image.width * 2.8 * 2,
+				width: stages.emptyTijuana.image.width * 2.8,
+				height: stages.activeTijuana.image.height * 2.8,
+				image: stages.emptyTijuana.image,
+			},
+		],
+
+		closeBgItems: [
+			{
+				description: 'orange smoggy buildings.',
+				numberOfItems: 15,
+				firstItemX: 0,
+				y: -150,
+				spacing: bgItems.close.light.smoggyOrangeBuildings.width * 2,
+				width: bgItems.close.light.smoggyOrangeBuildings.width * 2,
+				height: bgItems.close.light.smoggyOrangeBuildings.height * 2,
+				image: bgItems.close.light.smoggyOrangeBuildings,
+			},
+		],
+		farBgItems: [
+			{
+				description: 'orange smoggy skyline',
+				numberOfItems: 15,
+				firstItemX: 0,
+				y: -40,
+				spacing: bgItems.far.light.smoggyOrangeSkyline.width * 2,
+				width: bgItems.far.light.smoggyOrangeSkyline.width * 2,
+				height: bgItems.far.light.smoggyOrangeSkyline.height * 2,
+				image: bgItems.far.light.smoggyOrangeSkyline,
+			},
+		],
+
+		endOfStageX: 24000,
+	},
+	{
+		//stage 4: wrigleyville, index 3
+
+		bgTiles: [
+			{
+				description: 'wrigleyville looking street',
+				numberOfItems: 15,
+				firstItemX: 0,
+				y: -420,
+				spacing: stages.wrigleyville.image.width * 4.8,
+				width: stages.wrigleyville.image.width * 4.8,
+				height: stages.wrigleyville.image.height * 4.8,
+				image: stages.wrigleyville.image,
+			},
+		],
+
+		closeBgItems: [
+			{
+				description: 'maroon downtown buildings.',
+				numberOfItems: 15,
+				firstItemX: 0,
+				y: -150,
+				spacing: bgItems.close.dark.maroonBuildings.width * 2,
+				width: bgItems.close.dark.maroonBuildings.width * 2,
+				height: bgItems.close.dark.maroonBuildings.height * 2,
+				image: bgItems.close.dark.maroonBuildings,
+			},
+		],
+		farBgItems: [
+			{
+				description: 'dark green skyline',
+				numberOfItems: 15,
+				firstItemX: 0,
+				y: -40,
+				spacing: bgItems.far.dark.nightDowntownSkyline.width * 2,
+				width: bgItems.far.dark.nightDowntownSkyline.width * 2,
+				height: bgItems.far.dark.nightDowntownSkyline.height * 2,
+				image: bgItems.far.dark.nightDowntownSkyline,
+			},
+		],
+
 		endOfStageX: 24000,
 	},
 ];
