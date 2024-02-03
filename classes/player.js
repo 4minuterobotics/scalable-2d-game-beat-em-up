@@ -58,7 +58,8 @@ class Player {
 		};
 		this.speed = 5;
 		this.width = INDIVIDUAL_SPRITE_WIDTH;
-		this.height = 600;
+		this.height = 300;
+		this.debug = true;
 		this.startAnimation = true;
 		this.doingSomething = false;
 		this.frames = 0;
@@ -166,14 +167,29 @@ class Player {
 			this.currentCropWidth * this.spriteCounter, //sub rectangele x-position  (starts at 0 and increaes by the width of each animation)
 			0, // sub rectangle y-position
 			this.currentCropWidth, // sub rectangle width (width of 1 animation)
-			400, // sub rectangle height
+			200, // sub rectangle height
 			this.position.x, // canvas x-position
 			this.position.y, // canvas y-position
 			this.width, // width on canvas
 			this.height // height on canvas
 		);
-	}
 
+		if (this.debug) {
+			// Draw red outline
+			c.strokeStyle = 'red';
+			c.lineWidth = 2;
+			c.strokeRect(this.position.x, this.position.y, this.width, this.height);
+
+			// Draw a small red circle at the anchor point (top-left corner)
+			c.beginPath();
+			c.arc(this.position.x, this.position.y, 5, 0, Math.PI * 2, true); // Small circle with radius 5
+			c.fillStyle = 'red';
+			c.fill();
+		}
+	}
+	setDebug(mode) {
+		this.debug = mode;
+	}
 	increment_frames_and_sprite_counter() {
 		this.frames++; // incremementing this number by 1 will create a multiplier for the x position of the sprite sheet for animation
 		if (this.frames % this.refreshRate == 0) {

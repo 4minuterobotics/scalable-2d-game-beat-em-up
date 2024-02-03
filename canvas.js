@@ -1,7 +1,7 @@
 import Player from './classes/player';
 import Enemy from './classes/enemy.js';
 import { stage, createStageItems } from './utils/stageStuff.js';
-
+import { Circle, Rectangle, add, getHeight, getWidth, setTimer, stopTimer, Randomizer } from './codeHS.js';
 const gravity = 1;
 
 // utils.canvasStuff.create2dCanvasContext(canvas, 'canvas', c, '2d');
@@ -21,7 +21,7 @@ c.fillRect(0, 0, canvas.width, canvas.height);
 
 console.log(c);
 
-let currentLevel = 1;
+let currentLevel = 0;
 
 let testController = false;
 
@@ -35,6 +35,15 @@ let closeBgItems = [];
 let farBgItems = [];
 let veryFarBgItems = [];
 let horizonBgItems = [];
+
+//objects that can move in front and behind each other
+let moveableItems = [];
+
+//enemy objects that can be hit
+let enemies = [];
+
+//all stage objects
+export let allStageItems = [];
 
 let foregroundParallexRate = 5;
 let stageParallexRate = 0.66;
@@ -77,18 +86,26 @@ let scrollOffset = 0;
 /**
  * Initializes the game and starts the animation loop.
  */
-function main() {
-	init();
+async function main() {
+	await init();
 	animate();
+	// setTimer(animate, 15);
 }
 
 main();
 
 //this function will initialize the game objects
 function init() {
-	create_game_objects();
-	//this variable will track the players change in canvas x-position from its original position
-	scrollOffset = 0;
+	return new Promise((resolve, reject) => {
+		// Asynchronous initialization code here
+		create_game_objects(); //creates the images and game objects
+		setTimeout(() => {
+			console.log('Initialization completed');
+			resolve(); // Resolve when initialization is done
+		}, 5000); //  delay in millisec
+	});
+
+	scrollOffset = 0; //this variable will track the players change in canvas x-position from its original position
 
 	/*************************helper functions*****************************/
 	function create_game_objects() {
@@ -124,9 +141,13 @@ function init() {
 
 		//player object
 		player = new Player();
+		allStageItems.push(player);
+		moveableItems.push(player);
 
 		// other character object
 		neil = new Enemy();
+		allStageItems.push(neil);
+		moveableItems.push(neil);
 	}
 }
 
@@ -134,9 +155,6 @@ function init() {
 function animate() {
 	c.fillStyle = 'white';
 	c.fillRect(0, 0, canvas.width, canvas.height);
-
-	//fill canvas with the color white
-	// utils.canvasStuff.create_colored_canvas('white', 0, 0, utils.canvasStuff.canvas.width, utils.canvasStuff.canvas.height);
 
 	//drawing items
 	const drawItems = (items) => {
@@ -164,11 +182,13 @@ function animate() {
 		drawItems(typeOfStageBgItem);
 	});
 
-	//upadate the player spite frame number and crop position, then draws the sprite onto the screen, then updates its positon value
-	player.update();
-
-	//update the other players sprite
-	neil.update();
+	//all items that can change order on the screen get rendered based on their y value here
+	moveableItems?.sort((a, b) => {
+		return a.position.y + a.height - (b.position.y + b.height);
+	});
+	moveableItems?.forEach((item) => {
+		item.update();
+	});
 
 	stageForegroundItems?.forEach((typeOfForegroundItem) => {
 		drawItems(typeOfForegroundItem);
@@ -652,9 +672,9 @@ function adjust_player_y_velocity_based_on_player_y_position_and_direction_state
 	let player_is_moving_up_and_hasnt_reached_its_top_border = player.directionState.up == true && player.position.y >= canvas.height - 480;
 	let player_is_moving_angled_up_and_hasnt_reached_its_top_border =
 		(player.directionState.upRight == true || player.directionState.upLeft == true) && player.position.y >= canvas.height - 480;
-	let player_is_moving_down_and_hasnt_reached_its_bottom_border = player.directionState.down == true && player.position.y + player.height - 290 <= canvas.height;
+	let player_is_moving_down_and_hasnt_reached_its_bottom_border = player.directionState.down == true && player.position.y + player.height + 10 <= canvas.height;
 	let player_is_moving_angled_down_and_hasnt_reached_its_bottom_border =
-		(player.directionState.downRight == true || player.directionState.downLeft == true) && player.position.y + player.height - 290 <= canvas.height;
+		(player.directionState.downRight == true || player.directionState.downLeft == true) && player.position.y + player.height + 10 <= canvas.height;
 	let player_isnt_moving =
 		player.directionState.up == false &&
 		player.directionState.upRight == false &&
@@ -686,12 +706,12 @@ function adjust_player_y_velocity_based_on_player_y_position_and_direction_state
 /**********************************************************************************************************************enemy */
 function adjust_enemy_y_velocity_based_on_direction_states() {
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-	let enemy_is_moving_up_and_hasnt_reached_its_top_border = neil.directionState.up == true && neil.position.y >= canvas.height - 480;
+	let enemy_is_moving_up_and_hasnt_reached_its_top_border = neil.directionState.up == true && neil.position.y >= canvas.height - 370;
 	let enemy_is_moving_angled_up_and_hasnt_reached_its_top_border =
-		(neil.directionState.upRight == true || neil.directionState.upLeft == true) && neil.position.y >= canvas.height - 480;
-	let enemy_is_moving_down_and_hasnt_reached_its_bottom_border = neil.directionState.down == true && neil.position.y + neil.height - 290 <= canvas.height;
+		(neil.directionState.upRight == true || neil.directionState.upLeft == true) && neil.position.y >= canvas.height - 370;
+	let enemy_is_moving_down_and_hasnt_reached_its_bottom_border = neil.directionState.down == true && neil.position.y + neil.height + 10 <= canvas.height;
 	let enemy_is_moving_angled_down_and_hasnt_reached_its_bottom_border =
-		(neil.directionState.downRight == true || neil.directionState.downLeft == true) && neil.position.y + neil.height - 290 <= canvas.height;
+		(neil.directionState.downRight == true || neil.directionState.downLeft == true) && neil.position.y + neil.height + 10 <= canvas.height;
 	let enemy_isnt_moving =
 		neil.directionState.up == false &&
 		neil.directionState.upRight == false &&
@@ -866,6 +886,11 @@ function handle_action_sprite_changes_based_on_action_state() {
 			break;
 	}
 }
+
+// canvas.addEventListener('mousemove', () => {
+// 	console.log('Mouse moved over canvas');
+// 	movementKeys.up.pressed = true;
+// });
 
 // add event listeners for the keys. specify as a string what event is getting called
 window.addEventListener('keydown', (event) => {

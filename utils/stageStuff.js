@@ -2,12 +2,14 @@ import GenericObject from '../classes/genericObjects';
 import stages from '../img/stages/stageImages';
 import bgItems from '../img/bgItems/bgItems.js';
 import foregroundItems from '../img/foregroundItems/foregroundItems';
+import { allStageItems } from '../canvas.js';
 
 export function createStageItems(number_of_items, first_item_x, y, gap, width, height, img) {
 	let arr = [];
 	for (let i = 0; i < number_of_items; i++) {
 		let item = new GenericObject(first_item_x + gap * i, y, width, height, img);
 		arr.push(item);
+		allStageItems.push(item);
 	}
 	return arr;
 }

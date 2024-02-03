@@ -39,6 +39,7 @@ class Enemy {
 		this.speed = 5;
 		this.width = INDIVIDUAL_SPRITE_WIDTH;
 		this.height = 200;
+		this.debug = true;
 		this.startAnimation = false;
 		this.doingSomething = false;
 		this.frames = 0;
@@ -111,7 +112,7 @@ class Enemy {
         */
 		c.drawImage(
 			this.currentSprite, // sprite image
-			this.currentCropWidth * this.spriteCounter, //sub rectangele x-position  (starts at 0 and increaes by the width of each animation)
+			this.currentCropWidth * this.spriteCounter + 20, //sub rectangele x-position  (starts at 0 and increaes by the width of each animation)
 			0, // sub rectangle y-position
 			this.currentCropWidth, // sub rectangle width (width of 1 animation)
 			200, // sub rectangle height
@@ -120,6 +121,22 @@ class Enemy {
 			this.width, // width on canvas
 			this.height // height on canvas
 		);
+
+		if (this.debug) {
+			// Draw red outline
+			c.strokeStyle = 'red';
+			c.lineWidth = 2;
+			c.strokeRect(this.position.x, this.position.y, this.width, this.height);
+
+			// Draw a small red circle at the anchor point (top-left corner)
+			c.beginPath();
+			c.arc(this.position.x, this.position.y, 5, 0, Math.PI * 2, true); // Small circle with radius 5
+			c.fillStyle = 'red';
+			c.fill();
+		}
+	}
+	setDebug(mode) {
+		this.debug = mode;
 	}
 
 	increment_frames_and_sprite_counter() {
