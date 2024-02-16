@@ -12,7 +12,7 @@ class GenericObject {
 			y: y,
 		};
 		this.interactive = interactive;
-		this.debug = true; // Debug mode is off by default
+		this.debug = false; // Debug mode is off by default
 
 		// this.image.onload = () => {
 		// 	this.loaded = true;

@@ -71,7 +71,7 @@ class Player {
 		this.speed = 5;
 		this.width = INDIVIDUAL_SPRITE_WIDTH;
 		this.height = 300;
-		this.debug = true;
+		this.debug = false;
 		this.startAnimation = true;
 		this.doingSomething = false;
 		this.madeContact = false;

@@ -43,7 +43,7 @@ c.fillRect(0, 0, canvas.width, canvas.height);
 
 console.log(c);
 
-let currentLevel = 0;
+let currentLevel = 1;
 
 //testing enemy
 let testController = false;
@@ -127,7 +127,7 @@ function init() {
 		setTimeout(() => {
 			console.log('Initialization completed');
 			resolve(); // Resolve when initialization is done
-		}, 5000); //  delay in millisec
+		}, 2000); //  delay in millisec
 	});
 
 	scrollOffset = 0; //this variable will track the players change in canvas x-position from its original position
@@ -536,6 +536,10 @@ function adjust_player_x_velocity_and_background_and_foreground_based_on_player_
 				item.position.x -= player.speed * stageParallexRate;
 			});
 		}
+
+		//neil
+		neil.position.x -= player.speed * stageParallexRate;
+
 		//foreground items
 		for (let i = 0; i < stageForegroundItems.length; i++) {
 			stageForegroundItems[i]?.forEach((item) => {
@@ -577,6 +581,10 @@ function adjust_player_x_velocity_and_background_and_foreground_based_on_player_
 				item.position.x -= (player.speed * stageParallexRate) / 2;
 			});
 		});
+
+		//neil
+		neil.position.x -= (player.speed * stageParallexRate) / 2;
+
 		//foreground items
 		stageForegroundItems.forEach((group) => {
 			group?.forEach((item) => {
@@ -618,6 +626,10 @@ function adjust_player_x_velocity_and_background_and_foreground_based_on_player_
 				item.position.x += player.speed * stageParallexRate;
 			});
 		});
+
+		//neil
+		neil.position.x += player.speed * stageParallexRate;
+
 		//foreground items
 		stageForegroundItems.forEach((group) => {
 			group?.forEach((item) => {
@@ -659,6 +671,10 @@ function adjust_player_x_velocity_and_background_and_foreground_based_on_player_
 				item.position.x += (player.speed * stageParallexRate) / 2;
 			});
 		});
+
+		//neil
+		neil.position.x += (player.speed * stageParallexRate) / 2;
+
 		//foregroung items
 		stageForegroundItems.forEach((group) => {
 			group?.forEach((item) => {

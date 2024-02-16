@@ -37,10 +37,10 @@ class Enemy {
 			y: 0,
 		};
 		this.spriteOffset = 35;
-		this.speed = 5;
+		this.speed = 3;
 		this.width = INDIVIDUAL_SPRITE_WIDTH;
 		this.height = 200;
-		this.debug = true;
+		this.debug = false;
 		this.startAnimation = false;
 		this.doingSomething = false;
 		this.frames = 0;
