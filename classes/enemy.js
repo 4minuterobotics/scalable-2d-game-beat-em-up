@@ -36,6 +36,7 @@ class Enemy {
 			x: 0,
 			y: 0,
 		};
+		this.spriteOffset = 35;
 		this.speed = 5;
 		this.width = INDIVIDUAL_SPRITE_WIDTH;
 		this.height = 200;
@@ -61,7 +62,7 @@ class Enemy {
 				images: 1,
 			},
 		};
-		this.currentSprite = createImage(spriteIdleLeft);
+		this.currentSprite = this.sprites.stand.right;
 		this.currentCropWidth = INDIVIDUAL_SPRITE_WIDTH;
 		this.lastDirection = 'left';
 		this.directionState = {

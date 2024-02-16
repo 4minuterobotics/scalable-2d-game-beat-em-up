@@ -14,6 +14,15 @@ import spritePunchLeft from '../img/punch-left-spritesheet.png';
 import spritePunchRight from '../img/punch-right-spritesheet.png';
 import spriteBiteLeft from '../img/bite-left-spritesheet.png';
 import spriteBiteRight from '../img/bite-right-spritesheet.png';
+import spriteBiteLeftContact from '../img/character-sprites/venom/bite-left-spritesheet-contact.png';
+import spriteBiteRightContact from '../img/character-sprites/venom/bite-right-spritesheet-contact.png';
+import spriteSwipeLeftContact from '../img/character-sprites/venom/swipe-left-spritesheet-contact.png';
+import spriteSwipeRightContact from '../img/character-sprites/venom/swipe-right-spritesheet-contact.png';
+import spritePunchLeftContact from '../img/character-sprites/venom/punch-left-spritesheet-contact.png';
+import spritePunchRightContact from '../img/character-sprites/venom/punch-right-spritesheet-contact.png';
+
+import tank from '../img/bgItems/tank-1.png';
+let tankImg = createImage(tank);
 
 import punchMp3File from '../sounds/punch.mp3';
 import biteMp3File from '../sounds/bite.mp3';
@@ -23,6 +32,8 @@ import wetFartMp3File from '../sounds/wet-fart.mp3';
 import woodStepMp3File from '../sounds/wood-step.mp3';
 import myVoiceMp3File from '../sounds/my-voice.mp3';
 import transformersMp3File from '../sounds/transformers.mp3';
+import whipMp3File from '../sounds/whip.mp3';
+import tapMp3File from '../sounds/tap.mp3';
 
 import * as utils from '../utils/index.js';
 
@@ -56,12 +67,14 @@ class Player {
 			x: 0,
 			y: 0,
 		};
+		this.spriteOffset = 92;
 		this.speed = 5;
 		this.width = INDIVIDUAL_SPRITE_WIDTH;
 		this.height = 300;
 		this.debug = true;
 		this.startAnimation = true;
 		this.doingSomething = false;
+		this.madeContact = false;
 		this.frames = 0;
 		this.spriteCounter = 0;
 		this.refreshRate = 5; // the lower the faster
@@ -86,21 +99,28 @@ class Player {
 			},
 			bite: {
 				right: createImage(spriteBiteRight),
+				rightCollision: createImage(spriteBiteRightContact),
+				// left: this.collision_based_action_sprite(spriteBiteLeft, spriteBiteLeftContact), ////////////////////////////////
 				left: createImage(spriteBiteLeft),
+				leftCollision: createImage(spriteBiteLeftContact),
 				cropWidth: INDIVIDUAL_SPRITE_WIDTH,
 				width: INDIVIDUAL_SPRITE_WIDTH,
 				images: 8,
 			},
 			swipe: {
 				right: createImage(spriteSwipeRight),
+				rightCollision: createImage(spriteSwipeRightContact),
 				left: createImage(spriteSwipeLeft),
+				leftCollision: createImage(spriteSwipeLeftContact),
 				cropWidth: INDIVIDUAL_SPRITE_WIDTH,
 				width: INDIVIDUAL_SPRITE_WIDTH,
 				images: 7,
 			},
 			punch: {
 				right: createImage(spritePunchRight),
+				rightCollision: createImage(spritePunchRightContact),
 				left: createImage(spritePunchLeft),
+				leftCollision: createImage(spritePunchLeftContact),
 				cropWidth: INDIVIDUAL_SPRITE_WIDTH,
 				width: INDIVIDUAL_SPRITE_WIDTH,
 				images: 3,
@@ -133,9 +153,21 @@ class Player {
 			stop: true,
 		};
 		this.action = {
-			punch: false,
-			bite: false,
-			swipe: false,
+			punch: {
+				state: false,
+				attackWidth: 200,
+				attackHeight: 100,
+			},
+			bite: {
+				state: false,
+				attackWidth: 300,
+				attackHeight: 100,
+			},
+			swipe: {
+				state: false,
+				attackWidth: 150,
+				attackHeight: 100,
+			},
 		};
 		this.sound = {
 			punch: createSound(punchMp3File),
@@ -146,6 +178,8 @@ class Player {
 			woodStep: createSound(woodStepMp3File),
 			myVoice: createSound(myVoiceMp3File),
 			transform: createSound(transformersMp3File),
+			whip: createSound(whipMp3File),
+			tap: createSound(tapMp3File),
 		};
 		this.step = {
 			one: false,
@@ -394,7 +428,7 @@ class Player {
 		this.velocity.y = 0;
 	}
 
-	//action sprite update function
+	//direction sprite update function
 	change_sprite_based_on_direction_input(sprite, lastDir, cropWidth, width) {
 		this.currentSprite = sprite;
 		this.lastDirection = lastDir;
@@ -402,7 +436,7 @@ class Player {
 		this.width = width;
 	}
 
-	//direction sprite update function
+	//action sprite update function
 	update_player_action_sprite_based_on_action_state(sprite, lastDir, cropWidth, width) {
 		this.doingSomething = true;
 		this.reset_frames_and_sprite_counter();
@@ -412,6 +446,17 @@ class Player {
 		this.width = width;
 		this.velocity.y = 0;
 		this.velocity.x = 0;
+	}
+
+	//update current action sprite based on collision
+	collision_based_action_sprite(nonCollisionImage, collisionImage) {
+		let image;
+		if (this.madeContact) {
+			image = collisionImage;
+		} else {
+			image = nonCollisionImage;
+		}
+		return image;
 	}
 
 	update() {
@@ -448,24 +493,27 @@ class Player {
 		else if (this.spriteCounter == this.sprites.punch.images && (this.currentSprite == this.sprites.punch.right || this.currentSprite == this.sprites.punch.left)) {
 			this.reset_frames_and_sprite_counter();
 			this.doingSomething = false;
-			this.action.punch = false;
+			this.action.punch.state = false;
 			this.set_sprite_to_idle();
+			// this.madeContact = false;
 		}
 
 		//player cycled through bite images
 		else if (this.spriteCounter == this.sprites.bite.images && (this.currentSprite == this.sprites.bite.right || this.currentSprite == this.sprites.bite.left)) {
 			this.reset_frames_and_sprite_counter();
 			this.doingSomething = false;
-			this.action.bite = false;
+			this.action.bite.state = false;
 			this.set_sprite_to_idle();
+			// this.madeContact = false;
 		}
 
 		//player cycled through swipe images
 		else if (this.spriteCounter == this.sprites.swipe.images && (this.currentSprite == this.sprites.swipe.right || this.currentSprite == this.sprites.swipe.left)) {
 			this.reset_frames_and_sprite_counter();
 			this.doingSomething = false;
-			this.action.swipe = false;
+			this.action.swipe.state = false;
 			this.set_sprite_to_idle();
+			// this.madeContact = false;
 		}
 
 		//"2"
@@ -501,4 +549,103 @@ function createSound(audioSrc) {
 	return audio;
 }
 
-export default Player;
+export { Player };
+
+export class PlayerAttackCollision extends Player {
+	constructor(width, height, sprites, currentCropWidth, frames, spriteCounter, refreshRate) {
+		super(width, height, sprites, currentCropWidth, frames, spriteCounter, refreshRate);
+		this.currentSprite = tankImg;
+		this.madeContact = false;
+	}
+
+	update_collision_cloud_sprite_based_on_action_state(sprite, lastDir, cropWidth, width, collisionSound) {
+		// this.doingSomething = true;
+		this.reset_frames_and_sprite_counter();
+		this.currentSprite = sprite;
+		// this.lastDirection = lastDir;
+		this.currentCropWidth = cropWidth;
+		this.width = width;
+		// this.velocity.y = 0;
+		// this.velocity.x = 0;
+		collisionSound.play();
+	}
+
+	update(xPosition, yPosition, width, height) {
+		this.increment_frames_and_sprite_counter();
+		//player cycled through bite images
+		if (this.spriteCounter == this.sprites.bite.images && (this.currentSprite == this.sprites.bite.rightCollision || this.currentSprite == this.sprites.bite.leftCollision)) {
+			this.reset_frames_and_sprite_counter();
+			this.madeContact = false;
+		}
+
+		//player cycled through punch images
+		else if (
+			this.spriteCounter == this.sprites.punch.images &&
+			(this.currentSprite == this.sprites.punch.rightCollision || this.currentSprite == this.sprites.punch.leftCollision)
+		) {
+			this.reset_frames_and_sprite_counter();
+			this.madeContact = false;
+		}
+
+		//player cycled through swipe images
+		else if (
+			this.spriteCounter == this.sprites.swipe.images &&
+			(this.currentSprite == this.sprites.swipe.rightCollision || this.currentSprite == this.sprites.swipe.leftCollision)
+		) {
+			this.reset_frames_and_sprite_counter();
+			this.madeContact = false;
+		}
+
+		this.draw(xPosition, yPosition, width, height);
+	}
+
+	increment_frames_and_sprite_counter() {
+		this.frames++; // incremementing this number by 1 will create a multiplier for the x position of the sprite sheet for animation
+		if (this.frames % this.refreshRate == 0) {
+			this.spriteCounter++;
+		}
+	}
+
+	reset_frames_and_sprite_counter() {
+		this.frames = 0;
+		this.spriteCounter = 0;
+	}
+
+	draw(xPosition, yPosition, width, height) {
+		/*Starter Rectangle
+	c.fillStyle = 'red';
+	c.fillRect(this.position.x, this.position.y, this.width, this.height);
+	*/
+
+		/* Sprite sheet prameters
+	//drawImage(image, sx, sy, sWidth, sHeight, dx, dy, dWidth, dHeight)
+	*/
+		c.drawImage(
+			this.currentSprite, // sprite image
+			this.currentCropWidth * this.spriteCounter, //sub rectangele x-position  (starts at 0 and increaes by the width of each animation)
+			0, // sub rectangle y-position
+			this.currentCropWidth, // sub rectangle width (width of 1 animation)
+			200, // sub rectangle height
+			xPosition, // canvas x-position
+			yPosition, // canvas y-position
+			width, // width on canvas
+			height // height on canvas
+		);
+
+		if (this.debug) {
+			// Draw red outline
+			c.strokeStyle = 'red';
+			c.lineWidth = 2;
+			c.strokeRect(this.position.x, this.position.y, this.width, this.height);
+
+			// Draw a small red circle at the anchor point (top-left corner)
+			c.beginPath();
+			c.arc(this.position.x, this.position.y, 5, 0, Math.PI * 2, true); // Small circle with radius 5
+			c.fillStyle = 'red';
+			c.fill();
+		}
+	}
+	setDebug(mode) {
+		this.debug = mode;
+	}
+}

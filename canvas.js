@@ -1,8 +1,30 @@
-import Player from './classes/player';
+import { Player, PlayerAttackCollision } from './classes/player';
 import Enemy from './classes/enemy.js';
 import { stage, createStageItems } from './utils/stageStuff.js';
 import { Circle, Rectangle, add, getHeight, getWidth, setTimer, stopTimer, Randomizer } from './codeHS.js';
 const gravity = 1;
+
+////////////////////////////////////////// menu stuff
+document.getElementById('startGame').addEventListener('click', function () {
+	document.getElementById('gameMenu').style.display = 'none';
+	document.querySelector('canvas').style.display = 'block';
+	// Initialize or start the game here
+	main();
+});
+
+document.addEventListener('keydown', function (event) {
+	if (event.key === 'm' || event.key === 'M') {
+		const pauseMenu = document.getElementById('pauseMenu');
+		const canvas = document.querySelector('canvas');
+
+		if (canvas.style.display === 'block') {
+			// Ensures it works only when the game is visible
+			pauseMenu.style.display = pauseMenu.style.display === 'none' ? 'block' : 'none';
+			// Add logic to pause or resume the game based on the pauseMenu's visibility
+		}
+	}
+});
+///////////////////////////////////////////////
 
 // utils.canvasStuff.create2dCanvasContext(canvas, 'canvas', c, '2d');
 // utils.canvasStuff.set_canvas_size(1024, 576);
@@ -23,10 +45,15 @@ console.log(c);
 
 let currentLevel = 0;
 
+//testing enemy
 let testController = false;
+
+//testing attack positions
+let circ = new Circle(10, 10);
 
 //Class objects
 let player;
+let collisionCloud;
 let neil;
 let stageBackgroundTiles = []; // parallex scrolled background and hills
 let stageBackgroundItems = []; // human tanks
@@ -92,8 +119,6 @@ async function main() {
 	// setTimer(animate, 15);
 }
 
-main();
-
 //this function will initialize the game objects
 function init() {
 	return new Promise((resolve, reject) => {
@@ -144,10 +169,15 @@ function init() {
 		allStageItems.push(player);
 		moveableItems.push(player);
 
+		//attack collision cloud
+		collisionCloud = new PlayerAttackCollision();
+		allStageItems.push(collisionCloud);
+
 		// other character object
 		neil = new Enemy();
 		allStageItems.push(neil);
 		moveableItems.push(neil);
+		enemies.push(neil);
 	}
 }
 
@@ -189,6 +219,13 @@ function animate() {
 	moveableItems?.forEach((item) => {
 		item.update();
 	});
+
+	//for plarer attack impacts
+	if (collisionCloud.madeContact == true) {
+		collisionCloud.update(player.position.x, player.position.y, player.width, player.height);
+	}
+
+	add(circ);
 
 	stageForegroundItems?.forEach((typeOfForegroundItem) => {
 		drawItems(typeOfForegroundItem);
@@ -252,15 +289,15 @@ function animate() {
 function update_player_action_state_based_on_button_presses() {
 	//punching
 	if (actionKeys.space.pressed == true) {
-		player.action.punch = true;
+		player.action.punch.state = true;
 	}
 	//biting
 	else if (actionKeys.b.pressed == true) {
-		player.action.bite = true;
+		player.action.bite.state = true;
 	}
 	//swiping
 	else if (actionKeys.s.pressed == true) {
-		player.action.swipe = true;
+		player.action.swipe.state = true;
 	}
 }
 
@@ -852,45 +889,144 @@ function handle_enemy_directional_sprite_based_on_direction_state() {
 function handle_action_sprite_changes_based_on_action_state() {
 	switch (true) {
 		// player punching
-		case player.action.punch:
+		case player.action.punch.state:
 			player.sound.punch.play();
 			player.sound.myVoice.play();
 			if (lastKey == 'right') {
+				circ.setPosition(player.position.x + player.width / 2 + player.action.punch.attackWidth, player.position.y + player.height - player.action.punch.attackHeight);
+				// console.log(player.position.x + player.width / 2);
+				handle_enemy_damage(
+					player.action.punch.attackWidth,
+					player.sprites.punch.rightCollision,
+					lastKey,
+					player.sprites.punch.cropWidth,
+					player.sprites.punch.width,
+					player.sound.tap
+				);
 				player.update_player_action_sprite_based_on_action_state(player.sprites.punch.right, lastKey, player.sprites.punch.cropWidth, player.sprites.punch.width);
 			} else if (lastKey == 'left') {
+				circ.setPosition(
+					player.position.x + player.width / 2 - player.action.punch.attackWidth + player.spriteOffset,
+					player.position.y + player.height - player.action.punch.attackHeight
+				);
+				// console.log(player.position.x + player.width / 2);
+				handle_enemy_damage(
+					player.action.punch.attackWidth,
+					player.sprites.punch.leftCollision,
+					lastKey,
+					player.sprites.punch.cropWidth,
+					player.sprites.punch.width,
+					player.sound.tap
+				);
 				player.update_player_action_sprite_based_on_action_state(player.sprites.punch.left, lastKey, player.sprites.punch.cropWidth, player.sprites.punch.width);
 			}
 			break;
 
 		// player biting
-		case player.action.bite:
-			player.sound.bite.play();
+		case player.action.bite.state:
+			// player.sound.bite.play();
 			player.sound.dragon.play();
 			if (lastKey == 'right') {
+				circ.setPosition(player.position.x + player.width / 2 + player.action.bite.attackWidth, player.position.y + player.height - player.action.bite.attackHeight);
+				handle_enemy_damage(
+					player.action.bite.attackWidth,
+					player.sprites.bite.rightCollision,
+					lastKey,
+					player.sprites.bite.cropWidth,
+					player.sprites.bite.width,
+					player.sound.bite
+				);
 				player.update_player_action_sprite_based_on_action_state(player.sprites.bite.right, lastKey, player.sprites.bite.cropWidth, player.sprites.bite.width);
 			} else if (lastKey == 'left') {
+				circ.setPosition(
+					player.position.x + player.width / 2 - player.action.bite.attackWidth + player.spriteOffset,
+					player.position.y + player.height - player.action.bite.attackHeight
+				);
+				handle_enemy_damage(
+					player.action.bite.attackWidth,
+					player.sprites.bite.leftCollision,
+					lastKey,
+					player.sprites.bite.cropWidth,
+					player.sprites.bite.width,
+					player.sound.bite
+				);
 				player.update_player_action_sprite_based_on_action_state(player.sprites.bite.left, lastKey, player.sprites.bite.cropWidth, player.sprites.bite.width);
 			}
 			break;
 
 		// player swiping
-		case player.action.swipe:
+		case player.action.swipe.state:
 			player.sound.swipe.play();
 			player.sound.wetFart.play();
 			if (lastKey == 'right') {
-				player.reset_frames_and_sprite_counter();
+				circ.setPosition(player.position.x + player.width / 2 + player.action.swipe.attackWidth, player.position.y + player.height - player.action.swipe.attackHeight);
+				handle_enemy_damage(
+					player.action.swipe.attackWidth,
+					player.sprites.swipe.rightCollision,
+					lastKey,
+					player.sprites.swipe.cropWidth,
+					player.sprites.swipe.width,
+					player.sound.whip
+				);
 				player.update_player_action_sprite_based_on_action_state(player.sprites.swipe.right, lastKey, player.sprites.swipe.cropWidth, player.sprites.swipe.width);
 			} else if (lastKey == 'left') {
+				circ.setPosition(
+					player.position.x + player.width / 2 - player.action.swipe.attackWidth + player.spriteOffset,
+					player.position.y + player.height - player.action.swipe.attackHeight
+				);
+				handle_enemy_damage(
+					player.action.swipe.attackWidth,
+					player.sprites.swipe.leftCollision,
+					lastKey,
+					player.sprites.swipe.cropWidth,
+					player.sprites.swipe.width,
+					player.sound.whip
+				);
 				player.update_player_action_sprite_based_on_action_state(player.sprites.swipe.left, lastKey, player.sprites.swipe.cropWidth, player.sprites.swipe.width);
 			}
 			break;
 	}
+
+	////////////////////////////////
+	//this must eventually turn into a "forEach" iterating through the array holding enemy objects
+	function handle_enemy_damage(attackWidth, collisionSprite, direction, cropWidth, imageWidth, collisionSound) {
+		let enemy_is_to_the_left = player.position.x + player.width / 2 >= neil.position.x + neil.width / 2 + neil.spriteOffset;
+		let enemy_is_to_the_right = player.position.x + player.width / 2 <= neil.position.x + neil.width / 2 + neil.spriteOffset;
+		let enemy_within_left_striking_range =
+			player.position.x + player.width / 2 - attackWidth + player.spriteOffset - (neil.position.x + neil.width / 2 + neil.spriteOffset) <= 0;
+		let enemy_within_right_striking_range = neil.position.x + neil.width / 2 + neil.spriteOffset - (player.position.x + player.width / 2 + attackWidth) <= 0;
+		let enemy_within_y_striking_range = Math.abs(player.position.y + player.height - (neil.position.y + neil.height)) <= 20;
+		if (lastKey == 'right') {
+			if (enemy_is_to_the_right && enemy_within_right_striking_range && enemy_within_y_striking_range) {
+				console.log('hit enemy. now put the attackWidth range in the player class for that action and adjust the y value above in the conditions');
+				collisionCloud.madeContact = true;
+				console.log('player made contact: ', collisionCloud.madeContact);
+				collisionCloud.update_collision_cloud_sprite_based_on_action_state(collisionSprite, direction, cropWidth, imageWidth, collisionSound);
+			}
+		} else if (lastKey == 'left') {
+			if (enemy_is_to_the_left && enemy_within_left_striking_range && enemy_within_y_striking_range) {
+				console.log('hit enemy to the left. now put the attackWidth range in the player class for that action and adjust the y value above in the conditions');
+				collisionCloud.madeContact = true;
+				console.log('player made contact: ', collisionCloud.madeContact);
+				collisionCloud.update_collision_cloud_sprite_based_on_action_state(collisionSprite, direction, cropWidth, imageWidth, collisionSound);
+			}
+		}
+	}
 }
 
-// canvas.addEventListener('mousemove', () => {
-// 	console.log('Mouse moved over canvas');
-// 	movementKeys.up.pressed = true;
-// });
+function logXandY(event) {
+	const rect = canvas.getBoundingClientRect();
+	const x = event.clientX - rect.left;
+	const y = event.clientY - rect.top;
+	console.log(`X: ${x}, Y: ${y}`);
+}
+
+function mouseClickMethod(callback) {
+	canvas.addEventListener('click', callback);
+}
+
+// Call the function with logXandY as the callback
+mouseClickMethod(logXandY);
 
 // add event listeners for the keys. specify as a string what event is getting called
 window.addEventListener('keydown', (event) => {

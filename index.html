@@ -10,15 +10,70 @@
 				margin: 0;
 				background-color: black;
 
+				background-image: url('/img/harveycastle.png');
+				background-repeat: no-repeat;
+				background-size: 50% 50%; /* Cover the entire page */
+				background-position: center; /* Center the background image */
+
 				/* the lines below center the game in the middle of the screen  */
 				display: flex;
 				align-items: center;
 				justify-content: center;
 				height: 100vh;
 			}
+
+			canvas {
+				display: none; /* Initially hidden */
+			}
+
+			#gameMenu,
+			#pauseMenu {
+				text-align: center;
+				color: red; /* Bright green text */
+			}
+
+			#pauseMenu {
+				display: none; /* Initially hidden */
+				position: fixed;
+				top: 50%;
+				left: 50%;
+				transform: translate(-50%, -50%);
+				background: rgba(10, 15, 11, 0.9);
+				padding: 20px;
+				border: 3px solid #4dff4d;
+				z-index: 10;
+			}
+
+			a,
+			button {
+				display: inline-block;
+				background: #1a1f1b;
+				color: #4dff4d;
+				padding: 10px 20px;
+				margin: 10px;
+				text-decoration: none;
+				border: 2px solid #4dff4d;
+				cursor: pointer;
+			}
+
+			a:hover,
+			button:hover {
+				background: #4dff4d;
+				color: #0a0f0b;
+			}
 		</style>
 	</head>
 	<body>
+		<div id="gameMenu">
+			<h1>Harvey World, USA</h1>
+			<a href="#" id="startGame">Start Game</a>
+			<a href="other-games.html">Other Games</a>
+		</div>
+
+		<div id="pauseMenu">
+			<h2>Paused</h2>
+			<p>Press 'M' to Resume</p>
+		</div>
 		<canvas></canvas>
 		<!-- <div>
 			<h1>Exit game?</h1>
