@@ -905,7 +905,6 @@ function handle_action_sprite_changes_based_on_action_state() {
 			player.sound.punch.play();
 			player.sound.myVoice.play();
 			if (lastKey == 'right') {
-				circ.setPosition(player.position.x + player.width / 2 + player.action.punch.attackWidth, player.position.y + player.height - player.action.punch.attackHeight);
 				// console.log(player.position.x + player.width / 2);
 				handle_enemy_damage(
 					player.action.punch.attackWidth,
@@ -917,10 +916,6 @@ function handle_action_sprite_changes_based_on_action_state() {
 				);
 				player.update_player_action_sprite_based_on_action_state(player.sprites.punch.right, lastKey, player.sprites.punch.cropWidth, player.sprites.punch.width);
 			} else if (lastKey == 'left') {
-				circ.setPosition(
-					player.position.x + player.width / 2 - player.action.punch.attackWidth + player.spriteOffset,
-					player.position.y + player.height - player.action.punch.attackHeight
-				);
 				// console.log(player.position.x + player.width / 2);
 				handle_enemy_damage(
 					player.action.punch.attackWidth,
@@ -939,7 +934,6 @@ function handle_action_sprite_changes_based_on_action_state() {
 			// player.sound.bite.play();
 			player.sound.dragon.play();
 			if (lastKey == 'right') {
-				circ.setPosition(player.position.x + player.width / 2 + player.action.bite.attackWidth, player.position.y + player.height - player.action.bite.attackHeight);
 				handle_enemy_damage(
 					player.action.bite.attackWidth,
 					player.sprites.bite.rightCollision,
@@ -950,10 +944,6 @@ function handle_action_sprite_changes_based_on_action_state() {
 				);
 				player.update_player_action_sprite_based_on_action_state(player.sprites.bite.right, lastKey, player.sprites.bite.cropWidth, player.sprites.bite.width);
 			} else if (lastKey == 'left') {
-				circ.setPosition(
-					player.position.x + player.width / 2 - player.action.bite.attackWidth + player.spriteOffset,
-					player.position.y + player.height - player.action.bite.attackHeight
-				);
 				handle_enemy_damage(
 					player.action.bite.attackWidth,
 					player.sprites.bite.leftCollision,
@@ -971,7 +961,6 @@ function handle_action_sprite_changes_based_on_action_state() {
 			player.sound.swipe.play();
 			player.sound.wetFart.play();
 			if (lastKey == 'right') {
-				circ.setPosition(player.position.x + player.width / 2 + player.action.swipe.attackWidth, player.position.y + player.height - player.action.swipe.attackHeight);
 				handle_enemy_damage(
 					player.action.swipe.attackWidth,
 					player.sprites.swipe.rightCollision,
@@ -982,10 +971,6 @@ function handle_action_sprite_changes_based_on_action_state() {
 				);
 				player.update_player_action_sprite_based_on_action_state(player.sprites.swipe.right, lastKey, player.sprites.swipe.cropWidth, player.sprites.swipe.width);
 			} else if (lastKey == 'left') {
-				circ.setPosition(
-					player.position.x + player.width / 2 - player.action.swipe.attackWidth + player.spriteOffset,
-					player.position.y + player.height - player.action.swipe.attackHeight
-				);
 				handle_enemy_damage(
 					player.action.swipe.attackWidth,
 					player.sprites.swipe.leftCollision,
