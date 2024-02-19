@@ -26,21 +26,23 @@ const gravity = 1;
 
 /*****Enemy class ******/
 class Enemy {
-	constructor() {
+	constructor(xPos, yPos, speed) {
 		//the enemy properties
 		this.position = {
-			x: 300,
-			y: canvas.height - 200,
+			x: xPos,
+			y: yPos,
 		};
 		this.velocity = {
 			x: 0,
 			y: 0,
 		};
 		this.spriteOffset = 35;
-		this.speed = 3;
+		this.speed = speed;
 		this.width = INDIVIDUAL_SPRITE_WIDTH;
 		this.height = 200;
+		this.centerX = this.position.x + this.width / 2 + 30;
 		this.debug = false;
+		this.isActivated = false;
 		this.startAnimation = false;
 		this.doingSomething = false;
 		this.frames = 0;
@@ -195,6 +197,7 @@ class Enemy {
 		this.directionState.upLeft = false;
 		this.directionState.downLeft = false;
 		this.directionState.stop = false;
+		this.lastDirection = 'right';
 		// console.log('right pressed');
 	}
 
@@ -209,6 +212,7 @@ class Enemy {
 		this.directionState.upLeft = false;
 		this.directionState.downLeft = false;
 		this.directionState.stop = false;
+		this.lastDirection = 'left';
 		// console.log('left pressed');
 	}
 
@@ -251,6 +255,7 @@ class Enemy {
 		this.directionState.upLeft = false;
 		this.directionState.downLeft = false;
 		this.directionState.stop = false;
+		this.lastDirection = 'right';
 		// console.log('up right pressed');
 	}
 
@@ -265,6 +270,7 @@ class Enemy {
 		this.directionState.upLeft = false;
 		this.directionState.downLeft = false;
 		this.directionState.stop = false;
+		this.lastDirection = 'right';
 		// console.log('down right pressed');
 	}
 
@@ -279,6 +285,7 @@ class Enemy {
 		this.directionState.upLeft = true;
 		this.directionState.downLeft = false;
 		this.directionState.stop = false;
+		this.lastDirection = 'left';
 		// console.log('up left pressed');
 	}
 
@@ -293,6 +300,7 @@ class Enemy {
 		this.directionState.upLeft = false;
 		this.directionState.downLeft = true;
 		this.directionState.stop = false;
+		this.lastDirection = 'left';
 		// console.log('down left pressed');
 	}
 
@@ -365,6 +373,7 @@ class Enemy {
 	update() {
 		this.increment_frames_and_sprite_counter();
 
+		this.centerX = this.position.x + this.width / 2 + 30;
 		//stop the starting animation after 20 frames and reset the frames
 		// if (this.spriteCounter == this.sprites.start.images && this.startAnimation == true) {
 		// 	this.startAnimation = false;

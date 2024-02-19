@@ -26,8 +26,6 @@ document.addEventListener('keydown', function (event) {
 });
 ///////////////////////////////////////////////
 
-// utils.canvasStuff.create2dCanvasContext(canvas, 'canvas', c, '2d');
-// utils.canvasStuff.set_canvas_size(1024, 576);
 const canvas = document.querySelector('canvas');
 const c = canvas.getContext('2d');
 
@@ -44,12 +42,6 @@ c.fillRect(0, 0, canvas.width, canvas.height);
 console.log(c);
 
 let currentLevel = 1;
-
-//testing enemy
-let testController = false;
-
-//testing attack positions
-let circ = new Circle(10, 10);
 
 //Class objects
 let player;
@@ -78,7 +70,7 @@ let closeBgParallexRate = 0.13;
 let farBgParallexRate = 0.09;
 let veryFarParallexRate = 0.05;
 
-// button states
+// button states for player
 let lastKey = 'right';
 let movementKeys = {
 	right: {
@@ -174,7 +166,8 @@ function init() {
 		allStageItems.push(collisionCloud);
 
 		// other character object
-		neil = new Enemy();
+		// 1st param is distance the wave of enemeis from the start of the level. 2nd param is their y position, 3rd param is their speed
+		neil = new Enemy(1000, Randomizer.nextInt(canvas.height - 400, canvas.height - 200), Randomizer.nextInt(1, 3));
 		allStageItems.push(neil);
 		moveableItems.push(neil);
 		enemies.push(neil);
@@ -225,40 +218,40 @@ function animate() {
 		collisionCloud.update(player.position.x, player.position.y, player.width, player.height);
 	}
 
-	add(circ);
-
 	stageForegroundItems?.forEach((typeOfForegroundItem) => {
 		drawItems(typeOfForegroundItem);
 	});
 
 	/*************** action states ************/
-	if (testController == false) {
-		update_player_action_state_based_on_button_presses();
+	update_player_action_state_based_on_button_presses();
 
-		/*************** things only allowed if the player isn't currently doing an action */
-		if (player.doingSomething == false) {
-			/************** player direction states ************/
-			update_player_direction_state_based_on_button_presses();
+	/*************** things only allowed if the player isn't currently doing an action */
+	if (player.doingSomething == false) {
+		/************** player direction states ************/
+		update_player_direction_state_based_on_button_presses();
 
-			/*************lateral movement and platform scrolling **************/
+		/*************lateral movement and platform scrolling **************/
 
-			adjust_player_x_velocity_and_background_and_foreground_based_on_player_x_position_and_direction_states();
+		adjust_player_x_velocity_and_background_and_foreground_based_on_player_x_position_and_direction_states();
 
-			/***********Vertical movement **************/
-			adjust_player_y_velocity_based_on_player_y_position_and_direction_states();
+		/***********Vertical movement **************/
+		adjust_player_y_velocity_based_on_player_y_position_and_direction_states();
 
-			/******* directional based sprite switching conditional. **********/
-			handle_player_directional_sprite_based_on_direction_state();
+		/******* directional based sprite switching conditional. **********/
+		handle_player_directional_sprite_based_on_direction_state();
 
-			/******* action based sprite switching conditional. **********/
-			handle_action_sprite_changes_based_on_action_state();
-		}
-	} else {
-		//if (enemy x position - player x position < some amount ){
+		/******* action based sprite switching conditional. **********/
+		handle_action_sprite_changes_based_on_action_state();
+	}
+
+	if (Math.abs(neil.centerX - player.centerX) < 500) {
+		neil.isActivated = true;
+	}
+	if (neil.isActivated) {
 		// update_enemy_action_state_based_on_difficulty();
 
-		update_enemy_direction_state_based_on_button_presses();
-		// update_enemy_direction_state_based_on_player_position();
+		// update_enemy_direction_state_based_on_button_presses();
+		update_enemy_direction_state_based_on_player_position();
 
 		adjust_enemy_x_velocity_based_on_direction_states();
 		//adjust_enemy_x_velocity_based_on_player_position_and_difficulty();
@@ -269,8 +262,6 @@ function animate() {
 		handle_enemy_directional_sprite_based_on_direction_state();
 
 		// handle_action_sprite_changes_based_on_enemy_action_state();
-
-		//}
 	}
 	//win scenario
 	if (scrollOffset > stage[currentLevel].endOfStageX) {
@@ -389,58 +380,65 @@ function update_player_direction_state_based_on_button_presses() {
 }
 
 /************************************************************************************________________________________******* enemy */
-function update_enemy_direction_state_based_on_button_presses() {
+function update_enemy_direction_state_based_on_player_position() {
 	//movement condtions placed in loop to register button presses
-	let right_was_pressed = movementKeys.right.pressed == true && movementKeys.left.pressed == false && movementKeys.up.pressed == false && movementKeys.down.pressed == false;
-	let left_was_pressed = movementKeys.right.pressed == false && movementKeys.left.pressed == true && movementKeys.up.pressed == false && movementKeys.down.pressed == false;
-	let up_was_pressed = movementKeys.right.pressed == false && movementKeys.left.pressed == false && movementKeys.up.pressed == true && movementKeys.down.pressed == false;
-	let down_was_pressed = movementKeys.right.pressed == false && movementKeys.left.pressed == false && movementKeys.up.pressed == false && movementKeys.down.pressed == true;
-	let up_right_was_pressed = movementKeys.right.pressed == true && movementKeys.left.pressed == false && movementKeys.up.pressed == true && movementKeys.down.pressed == false;
-	let down_right_was_pressed =
-		movementKeys.right.pressed == true && movementKeys.left.pressed == false && movementKeys.up.pressed == false && movementKeys.down.pressed == true;
-	let up_left_was_pressed = movementKeys.right.pressed == false && movementKeys.left.pressed == true && movementKeys.up.pressed == true && movementKeys.down.pressed == false;
-	let down_left_was_pressed =
-		movementKeys.right.pressed == false && movementKeys.left.pressed == true && movementKeys.up.pressed == false && movementKeys.down.pressed == true;
-	let no_directional_keys_pressed =
-		movementKeys.right.pressed == false && movementKeys.left.pressed == false && movementKeys.up.pressed == false && movementKeys.down.pressed == false;
+	// let right_was_pressed = movementKeys.right.pressed == true && movementKeys.left.pressed == false && movementKeys.up.pressed == false && movementKeys.down.pressed == false;
+	// let left_was_pressed = movementKeys.right.pressed == false && movementKeys.left.pressed == true && movementKeys.up.pressed == false && movementKeys.down.pressed == false;
+	// let up_was_pressed = movementKeys.right.pressed == false && movementKeys.left.pressed == false && movementKeys.up.pressed == true && movementKeys.down.pressed == false;
+	// let down_was_pressed = movementKeys.right.pressed == false && movementKeys.left.pressed == false && movementKeys.up.pressed == false && movementKeys.down.pressed == true;
+	// let up_right_was_pressed = movementKeys.right.pressed == true && movementKeys.left.pressed == false && movementKeys.up.pressed == true && movementKeys.down.pressed == false;
+	// let down_right_was_pressed =
+	// 	movementKeys.right.pressed == true && movementKeys.left.pressed == false && movementKeys.up.pressed == false && movementKeys.down.pressed == true;
+	// let up_left_was_pressed = movementKeys.right.pressed == false && movementKeys.left.pressed == true && movementKeys.up.pressed == true && movementKeys.down.pressed == false;
+	// let down_left_was_pressed =
+	// 	movementKeys.right.pressed == false && movementKeys.left.pressed == true && movementKeys.up.pressed == false && movementKeys.down.pressed == true;
+	// let no_directional_keys_pressed =
+	// 	movementKeys.right.pressed == false && movementKeys.left.pressed == false && movementKeys.up.pressed == false && movementKeys.down.pressed == false;
+
+	///////////////////may need to include offset value to get this to work
+	let player_to_the_left = neil.centerX >= player.centerX + 100;
+	let player_to_the_right = neil.centerX <= player.centerX - 100;
+	let player_is_above = neil.position.y + neil.height - 10 > player.position.y + player.height;
+	let player_is_below = neil.position.y + neil.height + 10 < player.position.y + player.height;
+
+	let player_is_above_and_right = player_is_above && player_to_the_right;
+	let player_is_above_and_left = player_is_above && player_to_the_left;
+	let player_is_below_and_right = player_is_below && player_to_the_right;
+	let player_is_below_and_left = player_is_below && player_to_the_left;
 
 	//right
-	if (right_was_pressed) {
-		neil.set_movement_state_to_right();
+	if (player_to_the_right) {
+		if (player_is_above_and_right) {
+			neil.set_movement_state_to_up_right();
+		} else if (player_is_below_and_right) {
+			neil.set_movement_state_to_down_right();
+		} else {
+			neil.set_movement_state_to_right();
+		}
 	}
 	//left
-	else if (left_was_pressed) {
-		neil.set_movement_state_to_left();
-	}
-	//up
-	else if (up_was_pressed) {
-		neil.set_movement_state_to_up();
-	}
-	//down
-	else if (down_was_pressed) {
-		neil.set_movement_state_to_down();
-	}
-	//up right
-	else if (up_right_was_pressed) {
-		neil.set_movement_state_to_up_right();
-	}
-	//down right
-	else if (down_right_was_pressed) {
-		neil.set_movement_state_to_down_right();
-	}
-	//up left
-	else if (up_left_was_pressed) {
-		neil.set_movement_state_to_up_left();
-	}
-	//down left
-	else if (down_left_was_pressed) {
-		neil.set_movement_state_to_down_left();
-	}
-	//nothing pressed
-	else if (no_directional_keys_pressed) {
-		neil.set_movement_state_to_stop();
-
-		neil.step.one == false;
+	else if (player_to_the_left) {
+		if (player_is_above_and_left) {
+			neil.set_movement_state_to_up_left();
+		} else if (player_is_below_and_left) {
+			neil.set_movement_state_to_down_left();
+		} else {
+			neil.set_movement_state_to_left();
+		}
+	} else {
+		//above
+		if (neil.position.y + neil.height - 10 > player.position.y + player.height) {
+			neil.set_movement_state_to_up();
+		}
+		//below
+		else if (player_is_below) {
+			neil.set_movement_state_to_down();
+		}
+		//within range
+		else {
+			neil.set_movement_state_to_stop();
+			neil.step.one == false;
+		}
 	}
 }
 /************************************************************************************________________________________******* enemy */
@@ -691,9 +689,9 @@ function adjust_enemy_x_velocity_based_on_direction_states() {
 
 	let enemy_is_moving_left = neil.directionState.left == true;
 
-	let enemy_is_moving_angled_left = neil.directionState.upLeft == true;
+	let enemy_is_moving_angled_left = neil.directionState.upLeft == true || neil.directionState.downLeft;
 
-	let enemy_is_moving_angled_right = neil.directionState.upRight == true;
+	let enemy_is_moving_angled_right = neil.directionState.upRight == true || neil.directionState.downRight;
 
 	let enemy_isnt_moving_left_or_right =
 		neil.directionState.right == false &&
@@ -759,12 +757,10 @@ function adjust_player_y_velocity_based_on_player_y_position_and_direction_state
 /**********************************************************************************************************************enemy */
 function adjust_enemy_y_velocity_based_on_direction_states() {
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-	let enemy_is_moving_up_and_hasnt_reached_its_top_border = neil.directionState.up == true && neil.position.y >= canvas.height - 370;
-	let enemy_is_moving_angled_up_and_hasnt_reached_its_top_border =
-		(neil.directionState.upRight == true || neil.directionState.upLeft == true) && neil.position.y >= canvas.height - 370;
-	let enemy_is_moving_down_and_hasnt_reached_its_bottom_border = neil.directionState.down == true && neil.position.y + neil.height + 10 <= canvas.height;
-	let enemy_is_moving_angled_down_and_hasnt_reached_its_bottom_border =
-		(neil.directionState.downRight == true || neil.directionState.downLeft == true) && neil.position.y + neil.height + 10 <= canvas.height;
+	let enemy_is_moving_up_and_hasnt_reached_its_top_border = neil.directionState.up == true;
+	let enemy_is_moving_angled_up_and_hasnt_reached_its_top_border = neil.directionState.upRight == true || neil.directionState.upLeft == true;
+	let enemy_is_moving_down_and_hasnt_reached_its_bottom_border = neil.directionState.down == true;
+	let enemy_is_moving_angled_down_and_hasnt_reached_its_bottom_border = neil.directionState.downRight == true || neil.directionState.downLeft == true;
 	let enemy_isnt_moving =
 		neil.directionState.up == false &&
 		neil.directionState.upRight == false &&
@@ -856,7 +852,7 @@ function handle_enemy_directional_sprite_based_on_direction_state() {
 			neil.directionState.right == true ||
 			neil.directionState.upRight == true ||
 			neil.directionState.downRight == true) &&
-		lastKey == 'right' &&
+		neil.lastDirection == 'right' &&
 		neil.currentSprite != neil.sprites.run.right;
 	let enemy_is_moving_up_down_or_left_and_facing_left_and_sprite_isnt_showing_run_left =
 		(neil.directionState.up == true ||
@@ -864,12 +860,12 @@ function handle_enemy_directional_sprite_based_on_direction_state() {
 			neil.directionState.left == true ||
 			neil.directionState.upLeft == true ||
 			neil.directionState.downLeft == true) &&
-		lastKey == 'left' &&
+		neil.lastDirection == 'left' &&
 		neil.currentSprite != neil.sprites.run.left;
 	let enemy_has_stopped_and_facing_left_and_sprite_not_showing_idle_left =
-		neil.directionState.stop == true && lastKey == 'left' && neil.currentSprite != neil.sprites.stand.left;
+		neil.directionState.stop == true && neil.lastDirection == 'left' && neil.currentSprite != neil.sprites.stand.left;
 	let enemy_has_stopped_and_facing_right_and_sprite_not_showing_idle_right =
-		neil.directionState.stop == true && lastKey == 'right' && neil.currentSprite != neil.sprites.stand.right;
+		neil.directionState.stop == true && neil.lastDirection == 'right' && neil.currentSprite != neil.sprites.stand.right;
 
 	/*********************************** logic starts here********************************/
 	if (enemy_Direction_Has_Changed) {

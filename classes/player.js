@@ -63,14 +63,15 @@ class Player {
 			leftEdgeWhileOffsetted: -100,
 			leftEdgeWithNoOffset: -380,
 		};
+		this.speed = 5;
+		this.width = INDIVIDUAL_SPRITE_WIDTH;
+		this.height = 300;
+		this.centerX = this.position.x + this.width / 2 + 40;
 		this.velocity = {
 			x: 0,
 			y: 0,
 		};
 		this.spriteOffset = 92;
-		this.speed = 5;
-		this.width = INDIVIDUAL_SPRITE_WIDTH;
-		this.height = 300;
 		this.debug = false;
 		this.startAnimation = true;
 		this.doingSomething = false;
@@ -196,6 +197,7 @@ class Player {
 		/* Sprite sheet prameters
 		//drawImage(image, sx, sy, sWidth, sHeight, dx, dy, dWidth, dHeight)
         */
+
 		c.drawImage(
 			this.currentSprite, // sprite image
 			this.currentCropWidth * this.spriteCounter, //sub rectangele x-position  (starts at 0 and increaes by the width of each animation)
@@ -520,6 +522,7 @@ class Player {
 		this.draw();
 
 		/**position update***/
+		this.centerX = this.position.x + this.width / 2 + 40;
 		//update the x and y-position for the next frame to be itself plus the evergrowing value of the velocity due to gravity.
 		this.position.y += this.velocity.y;
 		this.position.x += this.velocity.x;
