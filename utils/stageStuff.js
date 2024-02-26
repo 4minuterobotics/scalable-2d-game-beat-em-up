@@ -1,8 +1,11 @@
 import GenericObject from '../classes/genericObjects';
+import Enemy from '../classes/enemy.js';
 import stages from '../img/stages/stageImages';
 import bgItems from '../img/bgItems/bgItems.js';
 import foregroundItems from '../img/foregroundItems/foregroundItems';
-import { allStageItems } from '../canvas.js';
+import { allStageItems, moveableItems, enemies } from '../canvas.js';
+import { Randomizer } from '../codeHS.js';
+// import { canvasWidth, canvasHeight } from '../canvas.js';
 
 export function createStageItems(number_of_items, first_item_x, y, gap, width, height, img) {
 	let arr = [];
@@ -10,6 +13,25 @@ export function createStageItems(number_of_items, first_item_x, y, gap, width, h
 		let item = new GenericObject(first_item_x + gap * i, y, width, height, img);
 		arr.push(item);
 		allStageItems.push(item);
+	}
+	return arr;
+}
+
+export function createEnemyWaves(number_of_enemies, x, y, speed, health) {
+	let arr = [];
+	let dynamicSpeed = speed;
+
+	let stoppingX = 200;
+	let stoppingY = 50;
+	for (let i = 0; i < number_of_enemies; i++) {
+		let dynamicX = Randomizer.nextInt(x, x + 1000);
+		let dynamicY = Randomizer.nextInt(y, y + 200);
+		let enemy = new Enemy(dynamicX, dynamicY, dynamicSpeed, stoppingX - Randomizer.nextInt(0, 100), stoppingY - Randomizer.nextInt(0, 50), health);
+		dynamicSpeed += 0.5;
+		arr.push(enemy);
+		allStageItems.push(enemy);
+		moveableItems.push(enemy);
+		enemies.push(enemy);
 	}
 	return arr;
 }
@@ -73,7 +95,32 @@ export let stage = [
 				image: bgItems.stageLevel.dark.darkTank,
 			},
 		],
-
+		enemyWave: [
+			{
+				description: 'wave 1, a bunch of neils',
+				numberOfEnemies: 3,
+				xPos: 2000,
+				yPos: 176,
+				speed: 1,
+				health: 2,
+			},
+			{
+				description: 'wave 2, a bunch of neils',
+				numberOfEnemies: 4,
+				xPos: 4000,
+				yPos: 176,
+				speed: 1,
+				health: 4,
+			},
+			{
+				description: 'wave 3, a bunch of neils',
+				numberOfEnemies: 5,
+				xPos: 6000,
+				yPos: 176,
+				speed: 1,
+				health: 6,
+			},
+		],
 		endOfStageX: 20000,
 	},
 

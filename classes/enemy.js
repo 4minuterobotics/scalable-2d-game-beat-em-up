@@ -26,8 +26,9 @@ const gravity = 1;
 
 /*****Enemy class ******/
 class Enemy {
-	constructor(xPos, yPos, speed) {
+	constructor(xPos, yPos, speed, stoppingXDistance = 100, stoppingYDistance = 0, health = 5) {
 		//the enemy properties
+		this.health = health;
 		this.position = {
 			x: xPos,
 			y: yPos,
@@ -35,6 +36,10 @@ class Enemy {
 		this.velocity = {
 			x: 0,
 			y: 0,
+		};
+		this.stoppingDistance = {
+			x: stoppingXDistance,
+			y: stoppingYDistance,
 		};
 		this.spriteOffset = 35;
 		this.speed = speed;
@@ -95,6 +100,7 @@ class Enemy {
 			swipe: false,
 		};
 		this.sound = {
+			speaking: false,
 			wassup: createSound(wassupMp3File),
 			wheresYourId: createSound(wheresYourIdMp3File),
 		};

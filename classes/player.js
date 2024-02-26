@@ -158,16 +158,19 @@ class Player {
 				state: false,
 				attackWidth: 200,
 				attackHeight: 100,
+				damage: 1,
 			},
 			bite: {
 				state: false,
 				attackWidth: 300,
 				attackHeight: 100,
+				damage: 3,
 			},
 			swipe: {
 				state: false,
 				attackWidth: 150,
 				attackHeight: 100,
+				damage: 2,
 			},
 		};
 		this.sound = {
