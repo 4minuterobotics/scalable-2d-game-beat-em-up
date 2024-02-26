@@ -17,12 +17,36 @@ import { stage, createStageItems, createEnemyWaves } from './utils/stageStuff.js
 import { Circle, Rectangle, add, getHeight, getWidth, setTimer, stopTimer, Randomizer } from './codeHS.js';
 const gravity = 1;
 
-////////////////////////////////////////// menu stuff
-document.getElementById('startGame').addEventListener('click', function () {
-	document.getElementById('gameMenu').style.display = 'none';
-	document.querySelector('canvas').style.display = 'block';
-	// Initialize or start the game here
-	main();
+document.addEventListener('DOMContentLoaded', function () {
+	// Add an event listener to the first element with the class name 'lawrenceGameStart'
+	const lawrenceGameStartButton = document.querySelector('.lawrenceGameStart');
+	if (lawrenceGameStartButton) {
+		lawrenceGameStartButton.addEventListener('click', function () {
+			// Hide elements with the class name 'homeScreen'
+			const homeScreens = document.getElementsByClassName('homeScreen');
+			for (let i = 0; i < homeScreens.length; i++) {
+				homeScreens[i].style.display = 'none';
+			}
+
+			// Display the element with the id 'gameMenu'
+			document.getElementById('gameMenu').style.display = 'block';
+		});
+	}
+
+	// Add an event listener to the element with the id 'startGame'
+	const startGameButton = document.getElementById('startGame');
+	if (startGameButton) {
+		startGameButton.addEventListener('click', function () {
+			// Hide the element with the id 'gameMenu'
+			document.getElementById('gameMenu').style.display = 'none';
+
+			// Display the canvas element
+			document.querySelector('canvas').style.display = 'block';
+
+			// Initialize or start the game here
+			main();
+		});
+	}
 });
 
 document.addEventListener('keydown', function (event) {
