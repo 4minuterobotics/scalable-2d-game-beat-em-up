@@ -13,7 +13,7 @@
 
 import { Player, PlayerAttackCollision } from './classes/player';
 import Enemy from './classes/enemy.js';
-import { stage, createStageItems, createEnemyWaves } from './utils/stageStuff.js';
+import { stage, initializeStageImages, createStageItems, createEnemyWaves } from './utils/stageStuff.js';
 import { Circle, Rectangle, add, getHeight, getWidth, setTimer, stopTimer, Randomizer } from './codeHS.js';
 const gravity = 1;
 
@@ -78,7 +78,7 @@ c.fillRect(0, 0, canvas.width, canvas.height);
 
 console.log(c);
 
-let currentLevel = 0;
+let currentLevel = 1;
 
 //Class objects
 let player;
@@ -143,16 +143,17 @@ let scrollOffset = 0;
 /**
  * Initializes the game and starts the animation loop.
  */
-function main() {
-	create_game_objects(); //creates the images and game objects
+async function main() {
+	await create_game_objects(); //creates the images and game objects
 	animate();
 }
 
 scrollOffset = 0; //this variable will track the players change in canvas x-position from its original position
 
 /*************************helper functions*****************************/
-function create_game_objects() {
+async function create_game_objects() {
 	//stage objects
+	await initializeStageImages();
 	stage[currentLevel].foregroundItems?.forEach((item, index) => {
 		// foreground items
 		stageForegroundItems[index] = createStageItems(item.numberOfItems, item.firstItemX, item.y, item.spacing, item.width, item.height, item.image);

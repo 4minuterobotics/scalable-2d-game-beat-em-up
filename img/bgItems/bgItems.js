@@ -10,42 +10,74 @@ import smoggyOrangeSkyline from './smoggy-orange-very-far-bg.png';
 import maroonBuildings from './maroon-buildings.png';
 import nightDowntownSkyline from './night-downtown-skyline.png';
 
-import createImage from '../../utils/imgStuff';
+// import createImage from '../../utils/imgStuff';
 
-let bgItems = {
-	stageLevel: {
-		dark: {
-			humanTank: createImage(tankWithHuman),
-			emptyTank: createImage(emptyLitTank),
-			darkTank: createImage(emptyDarkTank),
-		},
-	},
-	close: {
-		light: {
-			palmTreesAndGrass: createImage(palmTreesAndGrass),
-			smoggyOrangeBuildings: createImage(smoggyOrangeBuildings),
-		},
-		dark: { maroonBuildings: createImage(maroonBuildings) },
-	},
-	far: {
-		light: {
-			pinkEveningBuildings: createImage(pinkEveningBuildings),
-			smoggyOrangeSkyline: createImage(smoggyOrangeSkyline),
-		},
-		dark: { nightDowntownSkyline: createImage(nightDowntownSkyline) },
-	},
-	veryFar: {
-		light: {
-			pinkClouds: createImage(pinkClouds),
-		},
-		dark: {},
-	},
-	horizonMotionless: {
-		light: {
-			pinkMiamiSun: createImage(pinkMiamiSun),
-		},
-		dark: {},
-	},
-};
+export async function loadBackgroundItems() {
+	const loadedTankWithHuman = await createImage(tankWithHuman);
+	const loadedEmptyLitTank = await createImage(emptyLitTank);
+	const loadedEmptyDarkTank = await createImage(emptyDarkTank);
+	const loadedPalmTreesAndGrass = await createImage(palmTreesAndGrass);
+	const loadedSmoggyOrangeBuildings = await createImage(smoggyOrangeBuildings);
+	const loadedMaroonBuildings = await createImage(maroonBuildings);
+	const loadedPinkEveningBuildings = await createImage(pinkEveningBuildings);
+	const loadedSmoggyOrangeSkyline = await createImage(smoggyOrangeSkyline);
+	const loadedNightDowntownSkyline = await createImage(nightDowntownSkyline);
+	const loadedPinkClouds = await createImage(pinkClouds);
+	const loadedPinkMiamiSun = await createImage(pinkMiamiSun);
 
-export default bgItems;
+	const bgItems = {
+		stageLevel: {
+			dark: {
+				humanTank: loadedTankWithHuman,
+				emptyTank: loadedEmptyLitTank,
+				darkTank: loadedEmptyDarkTank,
+			},
+		},
+		close: {
+			light: {
+				palmTreesAndGrass: loadedPalmTreesAndGrass,
+				smoggyOrangeBuildings: loadedSmoggyOrangeBuildings,
+			},
+			dark: { maroonBuildings: loadedMaroonBuildings },
+		},
+		far: {
+			light: {
+				pinkEveningBuildings: loadedPinkEveningBuildings,
+				smoggyOrangeSkyline: loadedSmoggyOrangeSkyline,
+			},
+			dark: { nightDowntownSkyline: loadedNightDowntownSkyline },
+		},
+		veryFar: {
+			light: {
+				pinkClouds: loadedPinkClouds,
+			},
+			dark: {},
+		},
+		horizonMotionless: {
+			light: {
+				pinkMiamiSun: loadedPinkMiamiSun,
+			},
+			dark: {},
+		},
+	};
+
+	return bgItems;
+}
+
+async function createImage(imageSrc) {
+	try {
+		const loadedImage = await createImagePromise(imageSrc);
+		return loadedImage;
+	} catch (error) {
+		console.error('Failed to load the image:', error);
+	}
+}
+
+function createImagePromise(imageSrc) {
+	return new Promise((resolve, reject) => {
+		const image = new Image();
+		image.src = imageSrc;
+		image.onload = () => resolve(image);
+		image.onerror = (error) => reject(error);
+	});
+}
