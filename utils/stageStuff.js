@@ -204,11 +204,37 @@ export async function initializeStageImages() {
 					image: bgItems.horizonMotionless.light.pinkMiamiSun,
 				},
 			],
+			enemyWave: [
+				{
+					description: 'wave 1, a bunch of neils',
+					numberOfEnemies: 3,
+					xPos: 2000,
+					yPos: 176,
+					speed: 1,
+					health: 2,
+				},
+				{
+					description: 'wave 2, a bunch of neils',
+					numberOfEnemies: 4,
+					xPos: 4000,
+					yPos: 176,
+					speed: 1,
+					health: 4,
+				},
+				{
+					description: 'wave 3, a bunch of neils',
+					numberOfEnemies: 5,
+					xPos: 6000,
+					yPos: 176,
+					speed: 1,
+					health: 6,
+				},
+			],
 			endOfStageX: 24000,
 		},
+
 		{
 			//stage 3: tijuana, index 2
-
 			bgTiles: [
 				{
 					description: 'active tijuana looking street',
@@ -257,6 +283,32 @@ export async function initializeStageImages() {
 				},
 			],
 
+			enemyWave: [
+				{
+					description: 'wave 1, a bunch of neils',
+					numberOfEnemies: 3,
+					xPos: 2000,
+					yPos: 176,
+					speed: 1,
+					health: 2,
+				},
+				{
+					description: 'wave 2, a bunch of neils',
+					numberOfEnemies: 4,
+					xPos: 4000,
+					yPos: 176,
+					speed: 1,
+					health: 4,
+				},
+				{
+					description: 'wave 3, a bunch of neils',
+					numberOfEnemies: 5,
+					xPos: 6000,
+					yPos: 176,
+					speed: 1,
+					health: 6,
+				},
+			],
 			endOfStageX: 24000,
 		},
 		{
@@ -300,6 +352,32 @@ export async function initializeStageImages() {
 				},
 			],
 
+			enemyWave: [
+				{
+					description: 'wave 1, a bunch of neils',
+					numberOfEnemies: 3,
+					xPos: 2000,
+					yPos: 176,
+					speed: 1,
+					health: 2,
+				},
+				{
+					description: 'wave 2, a bunch of neils',
+					numberOfEnemies: 4,
+					xPos: 4000,
+					yPos: 176,
+					speed: 1,
+					health: 4,
+				},
+				{
+					description: 'wave 3, a bunch of neils',
+					numberOfEnemies: 5,
+					xPos: 6000,
+					yPos: 176,
+					speed: 1,
+					health: 6,
+				},
+			],
 			endOfStageX: 24000,
 		},
 	];
