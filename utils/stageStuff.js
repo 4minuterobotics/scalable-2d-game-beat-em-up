@@ -105,7 +105,7 @@ export async function initializeStageImages() {
 				{
 					description: 'wave 1, a bunch of neils',
 					numberOfEnemies: 3,
-					xPos: 2000,
+					xPos: 1000,
 					yPos: 176,
 					speed: 1,
 					health: 2,
@@ -113,7 +113,7 @@ export async function initializeStageImages() {
 				{
 					description: 'wave 2, a bunch of neils',
 					numberOfEnemies: 4,
-					xPos: 4000,
+					xPos: 3000,
 					yPos: 176,
 					speed: 1,
 					health: 4,
@@ -121,7 +121,7 @@ export async function initializeStageImages() {
 				{
 					description: 'wave 3, a bunch of neils',
 					numberOfEnemies: 5,
-					xPos: 6000,
+					xPos: 5000,
 					yPos: 176,
 					speed: 1,
 					health: 6,
@@ -208,7 +208,7 @@ export async function initializeStageImages() {
 				{
 					description: 'wave 1, a bunch of neils',
 					numberOfEnemies: 3,
-					xPos: 2000,
+					xPos: 700,
 					yPos: 176,
 					speed: 1,
 					health: 2,
@@ -216,7 +216,7 @@ export async function initializeStageImages() {
 				{
 					description: 'wave 2, a bunch of neils',
 					numberOfEnemies: 4,
-					xPos: 4000,
+					xPos: 1700,
 					yPos: 176,
 					speed: 1,
 					health: 4,
@@ -224,7 +224,7 @@ export async function initializeStageImages() {
 				{
 					description: 'wave 3, a bunch of neils',
 					numberOfEnemies: 5,
-					xPos: 6000,
+					xPos: 2700,
 					yPos: 176,
 					speed: 1,
 					health: 6,
@@ -356,7 +356,7 @@ export async function initializeStageImages() {
 				{
 					description: 'wave 1, a bunch of neils',
 					numberOfEnemies: 3,
-					xPos: 1000,
+					xPos: 2000,
 					yPos: 176,
 					speed: 1,
 					health: 2,
@@ -364,7 +364,7 @@ export async function initializeStageImages() {
 				{
 					description: 'wave 2, a bunch of neils',
 					numberOfEnemies: 4,
-					xPos: 3000,
+					xPos: 4000,
 					yPos: 176,
 					speed: 1,
 					health: 4,
@@ -372,7 +372,7 @@ export async function initializeStageImages() {
 				{
 					description: 'wave 3, a bunch of neils',
 					numberOfEnemies: 5,
-					xPos: 5000,
+					xPos: 6000,
 					yPos: 176,
 					speed: 1,
 					health: 6,
