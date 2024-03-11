@@ -38,6 +38,7 @@ import tapMp3File from '../sounds/tap.mp3';
 import * as utils from '../utils/index.js';
 
 import { Howl, Howler } from 'howler'; // for audio
+import { Circle } from '../codeHS.js';
 
 //these variables store the image objects
 let playerStandLeftImage = createImage(spriteStandLeft);
@@ -51,6 +52,8 @@ const INDIVIDUAL_SPRITE_WIDTH = 900;
 const canvas = document.querySelector('canvas');
 const c = canvas.getContext('2d');
 const gravity = 1;
+
+let centerCircle = new Circle(5);
 
 /*****Player class ******/
 class Player {
@@ -72,7 +75,7 @@ class Player {
 			y: 0,
 		};
 		this.spriteOffset = 92;
-		this.debug = false;
+		this.debug = true;
 		this.startAnimation = true;
 		this.doingSomething = false;
 		this.madeContact = false;
@@ -224,6 +227,10 @@ class Player {
 			c.arc(this.position.x, this.position.y, 5, 0, Math.PI * 2, true); // Small circle with radius 5
 			c.fillStyle = 'red';
 			c.fill();
+
+			//Draw a circle at the center bottom of the image
+			centerCircle.setPosition(this.centerX, this.position.y + this.height);
+			centerCircle.add();
 		}
 	}
 	setDebug(mode) {

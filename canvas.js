@@ -13,9 +13,12 @@
 
 import { Player, PlayerAttackCollision } from './classes/player';
 import Enemy from './classes/enemy.js';
+import JoyStick from './classes/controller.js';
+import Buttons from './classes/buttons.js';
 import { stage, initializeStageImages, createStageItems, createEnemyWaves } from './utils/stageStuff.js';
 import { Circle, Rectangle, add, getHeight, getWidth, setTimer, stopTimer, Randomizer } from './codeHS.js';
 const gravity = 1;
+let analog = new JoyStick(120, 510, 20);
 
 document.addEventListener('DOMContentLoaded', function () {
 	// Add an event listener to the first element with the class name 'lawrenceGameStart'
@@ -42,6 +45,9 @@ document.addEventListener('DOMContentLoaded', function () {
 
 			// Display the canvas element
 			document.querySelector('canvas').style.display = 'block';
+
+			// remove body bg image
+			document.querySelector('body').style.backgroundImage = 'none';
 
 			// Initialize or start the game here
 			main();
@@ -140,11 +146,14 @@ let actionKeys = {
 //Tracks the players change in canvas x-position from its original position
 let scrollOffset = 0;
 
+let joystickMode = false;
+
 /**
  * Initializes the game and starts the animation loop.
  */
 async function main() {
 	await create_game_objects(); //creates the images and game objects
+	setControllerMode();
 	animate();
 }
 
@@ -225,6 +234,12 @@ function animate() {
 
 	c.fillStyle = 'white';
 	c.fillRect(0, 0, canvas.width, canvas.height);
+
+	if (joystickMode) {
+		handleAnalog();
+	} else {
+		handleKeys();
+	}
 
 	//drawing items
 	const drawItems = (items) => {
@@ -349,6 +364,11 @@ function animate() {
 	if (player.position.y > canvas.height) {
 		// console.log('you lose');
 		init(); // reset player stats
+	}
+
+	if (joystickMode) {
+		analog.draw();
+		analog.drawText();
 	}
 
 	window.requestAnimationFrame(animate); // this is a JavaScript function that caues code to repeat over n over
@@ -483,42 +503,138 @@ function update_enemy_direction_state_based_on_player_position(enemy) {
 	let player_is_below_and_right = player_is_below && player_to_the_right;
 	let player_is_below_and_left = player_is_below && player_to_the_left;
 
+	let player_is_absolute_right = enemy.centerX <= player.centerX;
+	let player_is_absolute_left = enemy.centerX > player.centerX;
+	let player_is_absolute_above = enemy.position.y + enemy.height >= player.position.y + player.height;
+	let player_is_absolute_below = enemy.position.y + enemy.height < player.position.y + player.height;
+
+	//if the
+
 	//right
-	if (player_to_the_right) {
+	if (player_to_the_right && !enemy.surrounder.currentlySurrounding) {
 		enemy.sound.speaking = false;
 		if (player_is_above_and_right) {
 			enemy.set_movement_state_to_up_right();
+			console.log('moving up right');
 		} else if (player_is_below_and_right) {
 			enemy.set_movement_state_to_down_right();
+			console.log('moving down right');
 		} else {
 			enemy.set_movement_state_to_right();
+			console.log('moving right');
 		}
 	}
 	//left
-	else if (player_to_the_left) {
+	else if (player_to_the_left && !enemy.surrounder.currentlySurrounding) {
 		enemy.sound.speaking = false;
 		if (player_is_above_and_left) {
 			enemy.set_movement_state_to_up_left();
+			console.log('moving up left');
 		} else if (player_is_below_and_left) {
 			enemy.set_movement_state_to_down_left();
+			console.log('moving down left');
 		} else {
 			enemy.set_movement_state_to_left();
+			console.log('moving left');
 		}
 	} else {
 		//above
-		if (enemy.position.y + enemy.height - enemy.stoppingDistance.y > player.position.y + player.height) {
+		if (player_is_above && !enemy.surrounder.currentlySurrounding) {
 			enemy.sound.speaking = false;
 			enemy.set_movement_state_to_up();
+			console.log('moving up');
 		}
 		//below
-		else if (player_is_below) {
+		else if (player_is_below && !enemy.surrounder.currentlySurrounding) {
 			enemy.sound.speaking = false;
 			enemy.set_movement_state_to_down();
+			console.log('moving down');
 		}
+
 		//within range
 		else {
-			enemy.set_movement_state_to_stop();
+			// enemy.set_movement_state_to_stop();
+			if (enemy.surrounder.state == false) {
+				enemy.set_movement_state_to_stop();
+				console.log('moving to stop');
+			} else {
+				// console.log('player feet: ', player.position.y + player.height);
+				// console.log('player cant be less than', canvas.height - 150);
+				// console.log('player too high: ', player.position.y + player.height <= canvas.height - 150);
+				//handle surrounding
+				//if enemy is clear to move
+				if (enemy.surrounder.clearToMove == true) {
+					//currently surrounding the player
+					console.log('surrounding the player');
+					enemy.surrounder.currentlySurrounding = true;
+					// console.log('clear to move');
+					// if player is below the enemy
+					if (player_is_absolute_below) {
+						console.log('player is below');
+						//if the player is high on the canvas
+						if (player.position.y + player.height <= canvas.height - 150) {
+							console.log('player is too high on the canvas. cant go above');
+							//stop the enemy
+							console.log('player STOP!');
+							enemy.set_movement_state_to_stop();
+						} else if (player.position.y + player.height > canvas.height - 150) {
+							//otherwise if player is not high on the canvas
+							//if player is to the left of enemy
+							if (player_is_absolute_left) {
+								console.log('player is to the left');
+								//move enemy up left
+								console.log('walk up left!');
+								enemy.set_movement_state_to_up_left();
+							}
+							//otherwise if player is to the right of enemy
+							else if (player_is_absolute_right) {
+								console.log('player is to the right');
+								console.log('move down left!');
+								enemy.set_movement_state_to_down_left();
+							}
+						}
+					}
+					//otherwise if the player is above the enemy
+					else if (player_is_absolute_above) {
+						console.log('player is above');
+						//if player is low on the canvas
+						if (player.position.y + player.height + 50 >= canvas.height) {
+							console.log('player is too low on the canvas. cant go below');
+							//stop the enemy
+							console.log('player STOP!');
+							enemy.set_movement_state_to_stop();
+						} else {
+							//otherwise if player is not low on the canvas
+							//if player is to the left of enemy
+							if (player_is_absolute_left) {
+								console.log('player is to the left');
+								console.log('move down left!');
+								//move enemy down left
+								enemy.set_movement_state_to_down_left();
+							}
+							//otherwise if player is to the right of enemy
+							else if (player_is_absolute_right) {
+								console.log('player is to the right');
+								console.log('move up left!');
+								enemy.set_movement_state_to_up_left();
+							}
+						}
+					}
+					if (player_to_the_right) {
+						console.log('player has made it past stopping point');
+						console.log('stop being able to surround');
+						enemy.surrounder.state = false;
+						enemy.surrounder.currentlySurrounding = false;
+						// enemy.reset_frames_and_sprite_counter();
+						// enemy.change_sprite_based_on_direction_input(enemy.sprites.stand.right, 'right', enemy.sprites.stand.cropWidth, enemy.sprites.stand.width);
+					}
+				}
+			}
+			// if (player.position.y + player.height + 90 <= canvas.height)
+			//handle stepping sound
 			enemy.step.one == false;
+
+			//handle speaking
 			if (enemy.sound.speaking == false) {
 				enemy.sound.speaking = true;
 				let soundClip = Randomizer.nextInt(1, 2);
@@ -1471,25 +1587,204 @@ function mouseClickMethod(callback) {
 // Call the function with logXandY as the callback
 mouseClickMethod(logXandY);
 
-// add event listeners for the keys. specify as a string what event is getting called
-window.addEventListener('keydown', (event) => {
-	// console.log(event);
-	switch (event.key) {
-		case 'ArrowUp':
+function handleKeys() {
+	// add event listeners for the keys. specify as a string what event is getting called
+	window.addEventListener('keydown', (event) => {
+		// console.log(event);
+		switch (event.key) {
+			case 'ArrowUp':
+				//console.log('up');
+				if (player.startAnimation == false && player.doingSomething == false) {
+					movementKeys.up.pressed = true;
+				}
+				break;
+
+			case 'ArrowDown':
+				// console.log('down');
+				if (player.startAnimation == false && player.doingSomething == false) {
+					movementKeys.down.pressed = true;
+				}
+				break;
+
+			case 'ArrowLeft':
+				// console.log('left');
+				if (player.startAnimation == false && player.doingSomething == false) {
+					movementKeys.left.pressed = true;
+					lastKey = 'left';
+				}
+				break;
+
+			case 'ArrowRight':
+				// console.log('right');
+				if (player.startAnimation == false && player.doingSomething == false) {
+					movementKeys.right.pressed = true;
+					lastKey = 'right';
+				}
+				break;
+
+			case ' ':
+				if (player.startAnimation == false && player.doingSomething == false) {
+					actionKeys.space.pressed = true;
+				}
+				break;
+
+			case 'b':
+				// console.log('b');
+				if (player.startAnimation == false && player.doingSomething == false) {
+					actionKeys.b.pressed = true;
+				}
+				break;
+
+			case 's':
+				// console.log('s');
+				if (player.startAnimation == false && player.doingSomething == false) {
+					actionKeys.s.pressed = true;
+				}
+				break;
+
+			case 'x':
+				// console.log('x');
+				testController = !testController;
+				console.log('player doing something: ', player.doingSomething);
+
+				break;
+		}
+		// console.log(movementKeys.right.pressed);
+	});
+
+	window.addEventListener('keyup', (event) => {
+		switch (event.key) {
+			case 'ArrowUp':
+				// console.log('up');
+				movementKeys.up.pressed = false;
+				break;
+
+			case 'ArrowDown':
+				// console.log('duck');
+				movementKeys.down.pressed = false;
+
+				break;
+
+			case 'ArrowLeft':
+				// console.log('left');
+				movementKeys.left.pressed = false;
+				break;
+
+			case 'ArrowRight':
+				// console.log('right');
+				movementKeys.right.pressed = false;
+				break;
+
+			case ' ':
+				// console.log('space');
+				actionKeys.space.pressed = false;
+				break;
+
+			case 'b':
+				// console.log('space');
+				actionKeys.b.pressed = false;
+				break;
+
+			case 's':
+				// console.log('space');
+				actionKeys.s.pressed = false;
+				break;
+		}
+		// console.log(movementKeys.right.pressed);
+	});
+}
+
+//touch screen
+function handleAnalog() {
+	//once joystick is initially pressed
+	canvas.addEventListener(
+		'touchstart',
+		(e) => {
+			// e.preventDefault();
+			analog.x = e.touches[0].clientX;
+			analog.y = e.touches[0].clientY;
+
+			//keeps joystick wthin big circle range
+			let ax = analog.x - analog.X;
+			let ay = analog.y - analog.Y;
+
+			//magniture of ax and ay
+			let mag = Math.sqrt(ax * ax + ay * ay);
+
+			//unit vector (dx,dy)
+			analog.dx = ax / mag;
+			analog.dy = ay / mag;
+
+			//adding to vector method
+			if (mag > analog.R) {
+				analog.x = analog.X + analog.dx * analog.R;
+				analog.y = analog.Y + analog.dy * analog.R;
+			}
+		},
+		{ passive: true }
+	);
+
+	//allows joystick to move with touch
+	canvas.addEventListener(
+		'touchmove',
+		(e) => {
+			analog.x = e.changedTouches[0].clientX;
+			analog.y = e.changedTouches[0].clientY;
+
+			//keeps joystick wthin big circle range
+			let ax = analog.x - analog.X;
+			let ay = analog.y - analog.Y;
+
+			//magniture of ax and ay
+			let mag = Math.sqrt(ax * ax + ay * ay);
+
+			//unit vector (dx,dy)
+			analog.dx = ax / mag;
+			analog.dy = ay / mag;
+
+			//adding to vector method
+			if (mag > analog.R) {
+				analog.x = analog.X + analog.dx * analog.R;
+				analog.y = analog.Y + analog.dy * analog.R;
+			}
+		},
+		{ passive: true }
+	);
+
+	//resetting once joystick is released
+	canvas.addEventListener('touchend', (e) => {
+		analog.x = analog.X;
+		analog.y = analog.Y;
+		analog.dx = 0;
+		analog.dy = 0;
+	});
+
+	let roundedX = Math.round(analog.dx);
+	let roundedY = Math.round(analog.dy);
+	switch (roundedY) {
+		case -1:
 			//console.log('up');
 			if (player.startAnimation == false && player.doingSomething == false) {
 				movementKeys.up.pressed = true;
 			}
 			break;
 
-		case 'ArrowDown':
+		case 1:
 			// console.log('down');
 			if (player.startAnimation == false && player.doingSomething == false) {
 				movementKeys.down.pressed = true;
 			}
 			break;
 
-		case 'ArrowLeft':
+		case 0:
+			// console.log('stop y movement');
+			movementKeys.up.pressed = false;
+			movementKeys.down.pressed = false;
+			break;
+	}
+
+	switch (roundedX) {
+		case -1:
 			// console.log('left');
 			if (player.startAnimation == false && player.doingSomething == false) {
 				movementKeys.left.pressed = true;
@@ -1497,7 +1792,7 @@ window.addEventListener('keydown', (event) => {
 			}
 			break;
 
-		case 'ArrowRight':
+		case 1:
 			// console.log('right');
 			if (player.startAnimation == false && player.doingSomething == false) {
 				movementKeys.right.pressed = true;
@@ -1505,77 +1800,26 @@ window.addEventListener('keydown', (event) => {
 			}
 			break;
 
-		case ' ':
-			if (player.startAnimation == false && player.doingSomething == false) {
-				actionKeys.space.pressed = true;
-			}
-			break;
-
-		case 'b':
-			// console.log('b');
-			if (player.startAnimation == false && player.doingSomething == false) {
-				actionKeys.b.pressed = true;
-			}
-			break;
-
-		case 's':
-			// console.log('s');
-			if (player.startAnimation == false && player.doingSomething == false) {
-				actionKeys.s.pressed = true;
-			}
-			break;
-
-		case 'x':
-			// console.log('x');
-			testController = !testController;
-			console.log('player doing something: ', player.doingSomething);
-
-			break;
-	}
-	// console.log(movementKeys.right.pressed);
-});
-
-window.addEventListener('keyup', (event) => {
-	switch (event.key) {
-		case 'ArrowUp':
-			// console.log('up');
-			movementKeys.up.pressed = false;
-			break;
-
-		case 'ArrowDown':
-			// console.log('duck');
-			movementKeys.down.pressed = false;
-
-			break;
-
-		case 'ArrowLeft':
-			// console.log('left');
+		case 0:
+			// console.log('stopping x movement');
 			movementKeys.left.pressed = false;
-			break;
-
-		case 'ArrowRight':
-			// console.log('right');
 			movementKeys.right.pressed = false;
 			break;
-
-		case ' ':
-			// console.log('space');
-			actionKeys.space.pressed = false;
-			break;
-
-		case 'b':
-			// console.log('space');
-			actionKeys.b.pressed = false;
-			break;
-
-		case 's':
-			// console.log('space');
-			actionKeys.s.pressed = false;
-			break;
 	}
-	// console.log(movementKeys.right.pressed);
-});
+}
 
+function setControllerMode() {
+	if (window.innerWidth <= 800) {
+		// Example dimensions, adjust as needed
+		joystickMode = true; // Show joystick for small screens likely to be mobile devices
+		console.log('joystick mode true');
+	} else {
+		joystickMode = false; // Hide joystick for larger screens likely to be desktops
+		console.log('joystick mode false');
+		console.log('window innder width: ', window.innerWidth);
+		console.log('inner width less than 800: ', window.innerWidth <= 800);
+	}
+}
 // function calcPics() {
 // 	let start = {
 // 		pics: 20,

@@ -6,7 +6,7 @@ import spriteIdleRight from '../img/character-sprites/neil/idle-right-sprite.png
 
 import wassupMp3File from '../sounds/neil-wassup.mp3';
 import wheresYourIdMp3File from '../sounds/neil-wheres-your-id.mp3';
-
+import { Randomizer, Circle } from '../codeHS';
 // import * as utils from '../utils/index.js';
 
 import { Howl, Howler } from 'howler'; // for audio
@@ -24,9 +24,11 @@ const canvas = document.querySelector('canvas');
 const c = canvas.getContext('2d');
 const gravity = 1;
 
+let centerCircle = new Circle(5);
+
 /*****Enemy class ******/
 class Enemy {
-	constructor(xPos, yPos, speed, stoppingXDistance = 100, stoppingYDistance = 0, health = 5) {
+	constructor(xPos, yPos, speed, stoppingXDistance = 100, stoppingYDistance = 0, health = 5, surrounder) {
 		//the enemy properties
 		this.health = health;
 		this.position = {
@@ -46,7 +48,7 @@ class Enemy {
 		this.width = INDIVIDUAL_SPRITE_WIDTH;
 		this.height = 200;
 		this.centerX = this.position.x + this.width / 2 + 30;
-		this.debug = false;
+		this.debug = true;
 		this.isActivated = false;
 		this.startAnimation = false;
 		this.doingSomething = false;
@@ -108,6 +110,14 @@ class Enemy {
 			one: false,
 			two: false,
 		};
+		this.surrounder = {
+			state: surrounder,
+			inRangeStatus: false,
+			clearToMove: true,
+			movingStatus: false,
+			lastMovingStatus: false,
+			currentlySurrounding: false,
+		};
 	}
 	//the player methods
 	draw() {
@@ -133,7 +143,7 @@ class Enemy {
 
 		if (this.debug) {
 			// Draw red outline
-			c.strokeStyle = 'red';
+			c.strokeStyle = 'green';
 			c.lineWidth = 2;
 			c.strokeRect(this.position.x, this.position.y, this.width, this.height);
 
@@ -142,6 +152,10 @@ class Enemy {
 			c.arc(this.position.x, this.position.y, 5, 0, Math.PI * 2, true); // Small circle with radius 5
 			c.fillStyle = 'red';
 			c.fill();
+
+			//Draw a circle at the center bottom of the image
+			centerCircle.setPosition(this.centerX, this.position.y + this.height);
+			centerCircle.add();
 		}
 	}
 	setDebug(mode) {
@@ -335,7 +349,11 @@ class Enemy {
 		this.velocity.x = this.speed / 2;
 	}
 	move_left_half_speed() {
-		this.velocity.x = -this.speed / 2;
+		if (this.surrounder.currentlySurrounding) {
+			this.velocity.x = (-this.speed * 7) / 8;
+		} else {
+			this.velocity.x = -this.speed / 2;
+		}
 	}
 	stop_horizontal_movement() {
 		this.velocity.x = 0;
@@ -349,10 +367,18 @@ class Enemy {
 		this.velocity.y = this.speed;
 	}
 	move_up_half_speed() {
-		this.velocity.y = -this.speed / 2;
+		if (this.surrounder.currentlySurrounding) {
+			this.velocity.y = (-this.speed * 1) / 8;
+		} else {
+			this.velocity.y = -this.speed / 2;
+		}
 	}
 	move_down_half_speed() {
-		this.velocity.y = this.speed / 2;
+		if (this.surrounder.currentlySurrounding) {
+			this.velocity.y = (this.speed * 1) / 8;
+		} else {
+			this.velocity.y = this.speed / 2;
+		}
 	}
 	stop_vertical_movement() {
 		this.velocity.y = 0;

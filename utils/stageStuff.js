@@ -21,14 +21,17 @@ export function createStageItems(number_of_items, first_item_x, y, gap, width, h
 export function createEnemyWaves(number_of_enemies, x, y, speed, health) {
 	let arr = [];
 	let dynamicSpeed = speed;
+	let count = 1;
 
 	let stoppingX = 200;
 	let stoppingY = 50;
 	for (let i = 0; i < number_of_enemies; i++) {
 		let dynamicX = Randomizer.nextInt(x, x + 1000);
 		let dynamicY = Randomizer.nextInt(y, y + 200);
-		let enemy = new Enemy(dynamicX, dynamicY, dynamicSpeed, stoppingX - Randomizer.nextInt(0, 100), stoppingY - Randomizer.nextInt(0, 50), health);
+		let surrounder = count % 2 == 0;
+		let enemy = new Enemy(dynamicX, dynamicY, dynamicSpeed, stoppingX - Randomizer.nextInt(0, 100), stoppingY - Randomizer.nextInt(0, 50), health, surrounder);
 		dynamicSpeed += 0.5;
+		count += 1;
 		arr.push(enemy);
 		allStageItems.push(enemy);
 		moveableItems.push(enemy);
