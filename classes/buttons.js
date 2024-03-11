@@ -2,10 +2,10 @@ import cross from '../img/buttons/cross.png';
 import triangle from '../img/buttons/triangle.png';
 import circle from '../img/buttons/circle.png';
 import square from '../img/buttons/square.png';
-import crossPressed from '../img/buttons.crossPressed.png';
-import trianglePressed from '../img/buttons.trianglePressed.png';
-import circlePressed from '../img/buttons.circlePressed.png';
-import squarePressed from '../img/buttons.squarePressed.png';
+import crossPressed from '../img/buttons/crossPressed.png';
+import trianglePressed from '../img/buttons/trianglePressed.png';
+import circlePressed from '../img/buttons/circlePressed.png';
+import squarePressed from '../img/buttons/squarePressed.png';
 const canvas = document.querySelector('canvas');
 const c = canvas.getContext('2d');
 class Buttons {
