@@ -84,7 +84,7 @@ c.fillRect(0, 0, canvas.width, canvas.height);
 
 console.log(c);
 
-let currentLevel = 4;
+let currentLevel = 0;
 
 //Class objects
 let player;
