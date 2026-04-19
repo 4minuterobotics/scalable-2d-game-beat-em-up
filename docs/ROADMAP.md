@@ -89,6 +89,13 @@ Purpose: accessible onboarding for users who don't know the quick-edit panels. T
    - One-screen-per-action: no fields outside the current action type should clutter the screen.
 4. **Edit stage → content router.** "Background / Foreground layers" vs "Stage items" — each route goes to a tailored editor.
 5. **Under the hood:** guided mode calls the same endpoints as quick edit. It's a different Svelte route tree that produces the same JSON.
+6. **"What's wrong?" diagnostic helper.** A persistent button while editing. Clicking it opens a modal listing common symptoms in plain language (e.g., "legs cycle too fast", "character drifts sideways across cycles", "character is clipped at the edges", "footsteps fire too often", "impact FX appears on the wrong frame"). For each symptom:
+   - **Video clip** (4-8s, looping) showing the bug in action, recorded from a controlled reference character so the behavior is unambiguous.
+   - **Plain-language explanation** of what's happening and why.
+   - **Fix steps** tailored to the current editor context (e.g., "bump `frameWidth` down 25" when inside the sprite-sheet editor for a drift symptom).
+   - **Apply-fix button** that, where possible, offers a one-click correction with a "preview before save" option.
+   - Symptoms + videos + fixes live in a `docs/guided/diagnostics.json` + `docs/guided/videos/` pair so they can be expanded without code changes.
+   - Covers the fields listed in the `frameWidth`/`frameHeight`/`frameOffsetX`/`spriteCenterOffset`/`draw.width|height`/`rate`/`footsteps` tuning table in the project docs.
 
 ### 1.10 Remaining P1 editor features
 
