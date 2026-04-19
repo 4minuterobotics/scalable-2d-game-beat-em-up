@@ -20,6 +20,16 @@
 			? Object.keys(data.game.inputBindings ?? {}).filter((a) => !MOVEMENT_RESERVED.has(a))
 			: []
 	);
+	const bindableAnimationNames = $derived.by(() => {
+		if (!config) return [];
+		const locomotion = new Set([
+			config.walkAnimation,
+			config.runAnimation,
+			config.startAnimation,
+			config.hurtAnimation,
+		].filter(Boolean));
+		return animationNames.filter((n) => !locomotion.has(n));
+	});
 
 	async function save() {
 		if (!config) return;
@@ -386,7 +396,7 @@
 						onchange={(e) => bindAction(action, e.currentTarget.value)}
 					>
 						<option value="">(none)</option>
-						{#each animationNames as anim}
+						{#each bindableAnimationNames as anim}
 							<option value={anim}>{anim}</option>
 						{/each}
 					</select>

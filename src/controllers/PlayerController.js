@@ -21,10 +21,20 @@ export default class PlayerController {
 		// be fired as _startAction() — doing so locks the character into a looping
 		// animation with isActing=true and no exit.
 		const MOVEMENT_RESERVED = new Set(['right', 'left', 'up', 'down', 'sprint']);
+		// Slots the engine drives on its own (walk/run/start/hurt) must not be
+		// replayed via _startAction either — they're looping and would freeze the
+		// character.
+		const LOCOMOTION_SLOTS = new Set([
+			c.config.walkAnimation,
+			c.config.runAnimation,
+			c.config.startAnimation,
+			c.config.hurtAnimation,
+		].filter(Boolean));
 
 		if (c.config.inputActions) {
 			for (const [inputAction, animName] of Object.entries(c.config.inputActions)) {
 				if (MOVEMENT_RESERVED.has(inputAction)) continue;
+				if (LOCOMOTION_SLOTS.has(animName)) continue;
 				if (this.input.isDown(inputAction) && c.config.animations[animName]) {
 					c.intent.action = animName;
 					break;

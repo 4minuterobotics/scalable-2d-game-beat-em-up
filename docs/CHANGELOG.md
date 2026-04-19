@@ -21,6 +21,10 @@ Reverse-chronological log of notable changes. Kept current as part of each work 
 - Per-row **×** button removes a slot.
 - Renders slots in a compact grid with the slot name in monospace.
 
+### Input-action guard, round 2 — locomotion target slots
+- PlayerController now also refuses to fire an `inputAction` whose **target animation** is a locomotion slot (`walkAnimation`, `runAnimation`, `startAnimation`, `hurtAnimation`). Matters when a binding has OR-style key lists like `runRight: [shift, right]`: pressing just `right` used to pass the `isDown('runRight')` check and lock the character in the looping run animation. The guard now stops the lock regardless of how the action was bound.
+- CharacterEditor's per-action animation dropdown filters out those same locomotion slots from the selectable options, so the mapping can't be re-created from the UI either.
+
 ### Input-action guard against locomotion lock-up
 - PlayerController now treats `right`, `left`, `up`, `down`, `sprint` as reserved movement/modifier actions — **never** fires `_startAction` for them, even if `inputActions` has an explicit mapping. Previously, binding a movement key to an animation slot would call `_startAction`, which sets `isActing=true`; because the typical walk/run slot loops, the `end` event never fired and the character froze.
 - CharacterEditor's "Input actions" section now filters those five reserved names out of the dropdown so the trap can't be set again from the UI.
