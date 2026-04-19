@@ -17,7 +17,7 @@ const SUBLABEL_STYLE = 'font-weight:bold; margin-top:6px; color:#fff;';
 const BUTTON_STYLE = 'background:#1a1f1b; color:#4dff4d; border:1px solid #4dff4d; padding:6px 10px; cursor:pointer; width:100%;';
 
 export default class TuningPanel {
-	constructor({ onResetStage, stages = [], onSelectStage, characters = [], onSelectPlayer, currentPlayer = '' } = {}) {
+	constructor({ onResetStage, stages = [], onSelectStage, characters = [], onSelectPlayer, currentPlayer = '', difficulty = 1, onChangeDifficulty } = {}) {
 		this.world = null;
 		this.onResetStage = onResetStage;
 		this.stages = stages;
@@ -25,6 +25,8 @@ export default class TuningPanel {
 		this.characters = characters;
 		this.onSelectPlayer = onSelectPlayer;
 		this.currentPlayer = currentPlayer;
+		this.difficulty = difficulty;
+		this.onChangeDifficulty = onChangeDifficulty;
 		this.visible = false;
 		this.el = document.createElement('div');
 		this.el.id = 'tuning-panel';
@@ -306,6 +308,42 @@ export default class TuningPanel {
 
 	_actionsSection() {
 		const children = [];
+
+		if (this.onChangeDifficulty) {
+			const diffLabel = document.createElement('div');
+			diffLabel.style.cssText = SUBLABEL_STYLE;
+			diffLabel.textContent = 'Difficulty';
+			children.push(diffLabel);
+
+			const row = document.createElement('div');
+			row.style.cssText = 'display:flex; gap:8px; align-items:center; margin-bottom:8px;';
+			const input = document.createElement('input');
+			input.type = 'range';
+			input.min = '1';
+			input.max = '10';
+			input.step = '1';
+			input.value = String(this.difficulty);
+			input.style.cssText = 'flex:1;';
+			const val = document.createElement('span');
+			val.style.cssText = 'width:40px; text-align:right;';
+			val.textContent = String(this.difficulty);
+			input.addEventListener('input', (e) => {
+				const v = parseInt(e.target.value, 10);
+				val.textContent = String(v);
+				this.difficulty = v;
+			});
+			input.addEventListener('change', (e) => {
+				const v = parseInt(e.target.value, 10);
+				this.onChangeDifficulty(v);
+			});
+			const hint = document.createElement('div');
+			hint.style.cssText = 'font-size:10px; opacity:0.6; margin-bottom:6px;';
+			hint.textContent = 'Changes apply on next stage reload.';
+			row.appendChild(input);
+			row.appendChild(val);
+			children.push(row);
+			children.push(hint);
+		}
 
 		if (this.onSelectPlayer && this.characters.length > 0) {
 			const label = document.createElement('div');

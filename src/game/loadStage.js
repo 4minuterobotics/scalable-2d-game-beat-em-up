@@ -37,11 +37,20 @@ function buildLayers(stage) {
 	return { bg, fg };
 }
 
-function spawnEnemies(world, stage, enemyConfigs) {
+function resolveWaveCount(wave, difficulty) {
+	const base = wave.count ?? 1;
+	const perDiff = wave.countPerDifficulty ?? 0;
+	const jitter = wave.countJitter ?? 0;
+	const scaled = base + perDiff * Math.max(0, (difficulty ?? 1) - 1);
+	const jittered = scaled + (jitter > 0 ? Math.floor(Math.random() * (jitter + 1)) : 0);
+	return Math.max(0, Math.round(jittered));
+}
+
+function spawnEnemies(world, stage, enemyConfigs, difficulty) {
 	for (const wave of stage.enemies ?? []) {
 		const cfg = enemyConfigs[wave.character ?? wave.type];
 		if (!cfg) continue;
-		const count = wave.count ?? 1;
+		const count = resolveWaveCount(wave, difficulty);
 		let speed = wave.speed ?? cfg.speed;
 		for (let i = 0; i < count; i++) {
 			const x = wave.x + (wave.xJitter ? Math.random() * wave.xJitter : 0) + i * (wave.spacing ?? 0);
@@ -62,7 +71,7 @@ function spawnEnemies(world, stage, enemyConfigs) {
 	}
 }
 
-export default function loadStage({ stage, playerConfig, enemyConfigs, input, viewport, bounds, playerStart }) {
+export default function loadStage({ stage, playerConfig, enemyConfigs, input, viewport, bounds, playerStart, difficulty = 1 }) {
 	const { bg, fg } = buildLayers(stage);
 	const world = new World({
 		viewportWidth: viewport.width,
@@ -77,7 +86,7 @@ export default function loadStage({ stage, playerConfig, enemyConfigs, input, vi
 	const playerController = new PlayerController(player, input);
 	world.setPlayer(player, playerController);
 
-	spawnEnemies(world, stage, enemyConfigs);
+	spawnEnemies(world, stage, enemyConfigs, difficulty);
 
 	return world;
 }

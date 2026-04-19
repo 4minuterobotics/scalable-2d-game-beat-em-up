@@ -166,6 +166,7 @@ export default async function loadGame(slug) {
 		playerCharacter: game.playerCharacter,
 		inputBindings: game.inputBindings ?? {},
 		stageOrder: game.stageOrder ?? [],
+		difficulty: typeof game.difficulty === 'number' ? game.difficulty : 1,
 		characters,
 		stageLoaders,
 		soundMap,

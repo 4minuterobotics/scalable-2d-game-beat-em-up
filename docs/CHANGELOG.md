@@ -21,6 +21,13 @@ Reverse-chronological log of notable changes. Kept current as part of each work 
 - Per-row **×** button removes a slot.
 - Renders slots in a compact grid with the slot name in monospace.
 
+### Difficulty system (Task 6)
+- New top-level `game.difficulty` (integer, default 1). Exposed from `loadGame` to runtime and editors.
+- Per-wave `countPerDifficulty` and `countJitter` in stage JSON. Actual spawn count: `count + countPerDifficulty * (difficulty - 1) + randInt(0..countJitter)`. Rounded and clamped ≥ 0.
+- **TuningPanel** (press T): new **Difficulty** slider (1-10). On change, persists to `game.json` via `/_dev/save-game`. Takes effect on the next stage reload (reset stage or pick a new one from the Stage dropdown to apply immediately).
+- **StageEditor**: each wave now shows inputs for "count (at difficulty 1)", "+ per difficulty", and "count jitter". Defaults are 0 so existing stages keep their fixed counts.
+- Backward-compatible: stages with no difficulty-scaling fields render identically to before.
+
 ### Sprite sheet editor — projectile + explosion ranges (Task 5)
 - Three separate selection ranges per save: **Main** (character animation, existing), **Projectile** (flying bullet/fireball frames, optional), **Explosion** (collision/impact frames, optional).
 - Tab bar above the hint lets the user switch which range is active. Clicks on the canvas apply to the active range. Each range draws with its own color: green (main), blue (projectile), orange (explosion).

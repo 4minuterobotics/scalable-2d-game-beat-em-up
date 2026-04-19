@@ -33,6 +33,8 @@
 		config.enemies.push({
 			character: characterNames[0] ?? '',
 			count: 1,
+			countPerDifficulty: 0,
+			countJitter: 0,
 			x: 1000,
 			xJitter: 0,
 			yMin: 176,
@@ -282,8 +284,16 @@
 						</select>
 					</label>
 					<label>
-						<span>count</span>
-						<input type="number" min="1" bind:value={wave.count} />
+						<span>count (at difficulty 1)</span>
+						<input type="number" min="0" bind:value={wave.count} />
+					</label>
+					<label>
+						<span>+ per difficulty</span>
+						<input type="number" min="0" bind:value={wave.countPerDifficulty} placeholder="0" />
+					</label>
+					<label>
+						<span>count jitter (+0..N extra)</span>
+						<input type="number" min="0" bind:value={wave.countJitter} placeholder="0" />
 					</label>
 					<label>
 						<span>x (spawn center)</span>

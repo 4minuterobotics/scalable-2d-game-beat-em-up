@@ -48,6 +48,7 @@ async function main() {
 			viewport: game.viewport,
 			bounds: game.bounds,
 			playerStart: game.playerStart,
+			difficulty: game.difficulty,
 		});
 
 		world.stageName = stageName;
@@ -99,9 +100,27 @@ async function main() {
 					tuningPanel.currentPlayer = name;
 					startStage(stageIndex);
 				},
+				difficulty: game.difficulty ?? 1,
+				onChangeDifficulty: async (value) => {
+					game.difficulty = value;
+					try {
+						const res = await fetch(`/src/data/games/${GAME_SLUG}/game.json`);
+						if (!res.ok) return;
+						const cfg = await res.json();
+						cfg.difficulty = value;
+						await fetch('/_dev/save-game', {
+							method: 'POST',
+							headers: { 'Content-Type': 'application/json' },
+							body: JSON.stringify({ gameSlug: GAME_SLUG, config: cfg }),
+						});
+					} catch (err) {
+						console.error('Failed to save difficulty:', err);
+					}
+				},
 			});
 		}
 		tuningPanel.currentPlayer = currentPlayerName;
+		tuningPanel.difficulty = game.difficulty ?? 1;
 		tuningPanel.setWorld(world);
 	};
 
