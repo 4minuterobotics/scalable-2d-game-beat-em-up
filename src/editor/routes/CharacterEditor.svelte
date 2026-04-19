@@ -14,7 +14,12 @@
 	const animationNames = $derived(config ? Object.keys(config.animations ?? {}) : []);
 	const soundSlotNames = $derived(config ? Object.keys(config.soundSlots ?? {}) : []);
 	const animationOptionsWithNone = $derived(['', ...animationNames]);
-	const gameActionNames = $derived(data ? Object.keys(data.game.inputBindings ?? {}) : []);
+	const MOVEMENT_RESERVED = new Set(['right', 'left', 'up', 'down', 'sprint']);
+	const gameActionNames = $derived(
+		data
+			? Object.keys(data.game.inputBindings ?? {}).filter((a) => !MOVEMENT_RESERVED.has(a))
+			: []
+	);
 
 	async function save() {
 		if (!config) return;

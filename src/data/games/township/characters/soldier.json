@@ -153,11 +153,7 @@
       "isProjectile": false
     }
   },
-  "inputActions": {
-    "right": "right",
-    "runRight": "runRight",
-    "shootLow": "shootLow"
-  },
+  "inputActions": {},
   "soundSlots": {
     "hurt": "hurt",
     "death": "death",

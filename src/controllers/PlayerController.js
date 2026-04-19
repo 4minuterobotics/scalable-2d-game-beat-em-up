@@ -17,8 +17,14 @@ export default class PlayerController {
 		c.intent.moveY = down - up;
 		c.intent.sprint = this.input.isDown('sprint');
 
+		// Actions that the engine handles specially (movement/modifier) must never
+		// be fired as _startAction() — doing so locks the character into a looping
+		// animation with isActing=true and no exit.
+		const MOVEMENT_RESERVED = new Set(['right', 'left', 'up', 'down', 'sprint']);
+
 		if (c.config.inputActions) {
 			for (const [inputAction, animName] of Object.entries(c.config.inputActions)) {
+				if (MOVEMENT_RESERVED.has(inputAction)) continue;
 				if (this.input.isDown(inputAction) && c.config.animations[animName]) {
 					c.intent.action = animName;
 					break;
@@ -31,7 +37,7 @@ export default class PlayerController {
 		// reaction slot the engine drives on its own.
 		if (!c.intent.action) {
 			const excluded = new Set([
-				'right', 'left', 'up', 'down', 'sprint',
+				...MOVEMENT_RESERVED,
 				c.config.walkAnimation,
 				c.config.runAnimation,
 				c.config.startAnimation,

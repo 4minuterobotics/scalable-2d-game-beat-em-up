@@ -21,6 +21,12 @@ Reverse-chronological log of notable changes. Kept current as part of each work 
 - Per-row **×** button removes a slot.
 - Renders slots in a compact grid with the slot name in monospace.
 
+### Input-action guard against locomotion lock-up
+- PlayerController now treats `right`, `left`, `up`, `down`, `sprint` as reserved movement/modifier actions — **never** fires `_startAction` for them, even if `inputActions` has an explicit mapping. Previously, binding a movement key to an animation slot would call `_startAction`, which sets `isActing=true`; because the typical walk/run slot loops, the `end` event never fired and the character froze.
+- CharacterEditor's "Input actions" section now filters those five reserved names out of the dropdown so the trap can't be set again from the UI.
+- Cleaned the stray `right → right`, `left → right` entries out of `soldier.json`.
+- Walk, run, and sprint are still fully driven by `walkAnimation` / `runAnimation` / `sprintSpeedMultiplier` as before.
+
 ### Input → animation auto-wiring
 - **PlayerController** — when no explicit `inputActions` mapping exists for a held key, the engine now auto-fires any animation whose slot name matches the action. Excludes movement / modifier actions (`right`, `left`, `up`, `down`, `sprint`) and the character's own `walkAnimation` / `runAnimation` / `startAnimation` / `hurtAnimation` targets so locomotion slots aren't hijacked as button actions.
 - **SpriteSheetEditor** — saving an animation to a slot that matches a game action now also writes `inputActions[slot] = slot` on the character, subject to the same exclusions. Status line notes when auto-wiring happened.
