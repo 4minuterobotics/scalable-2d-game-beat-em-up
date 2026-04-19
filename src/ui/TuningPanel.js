@@ -61,9 +61,24 @@ export default class TuningPanel {
 		});
 	}
 
+	updateLiveDebug() {
+		if (!this._liveDebug || !this.world?.player) return;
+		const p = this.world.player;
+		const intent = p.intent ?? {};
+		this._liveDebug.textContent =
+			`vx ${p.vx.toFixed(2)}  vy ${p.vy.toFixed(2)}  ` +
+			`anim ${p.animator.current}  ` +
+			`sprint ${intent.sprint ? 'on' : 'off'}  ` +
+			`acting ${p.isActing ? 'yes' : 'no'}`;
+	}
+
 	_rebuild() {
 		this._body.innerHTML = '';
 		if (!this.world) return;
+		this._liveDebug = document.createElement('div');
+		this._liveDebug.style.cssText = 'font-family:monospace; font-size:11px; opacity:0.85; margin-bottom:8px; padding:4px 6px; border:1px dashed #4dff4d;';
+		this._liveDebug.textContent = '(live state will appear here)';
+		this._body.appendChild(this._liveDebug);
 		this._body.appendChild(this._cameraSection());
 		this._body.appendChild(this._boundsSection());
 		this._body.appendChild(this._playerSection());

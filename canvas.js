@@ -70,7 +70,10 @@ async function main() {
 		};
 
 		const scene = {
-			update: () => world.update(),
+			update: () => {
+				world.update();
+				if (tuningPanel?.visible) tuningPanel.updateLiveDebug();
+			},
 			draw: (ctx) => {
 				world.draw(ctx);
 				if (joystick) joystick.draw();
