@@ -64,17 +64,12 @@ export default class Animator {
 			const sheet = anim.sheet;
 			const image = direction === 'left' ? anim.mirroredImage ?? anim.image ?? sheet.image : anim.image ?? sheet.image;
 			if (!image) return null;
-			// Prefer an explicit per-animation frame size, then the character-level default, then the sheet-inferred cell size.
-			// Cell size (sheet.frameWidth) is a last-resort fallback because sheets often include transparent padding around the real art.
 			const sw = anim.frameWidth ?? this.config.frameWidth ?? sheet.frameWidth;
 			const sh = anim.frameHeight ?? this.config.frameHeight ?? sheet.frameHeight;
-			// Stride per cell on the sheet (used to position the column) — use the inferred cell size so row/column math matches the grid.
-			const cellW = sheet.frameWidth ?? sw;
-			const cellH = sheet.frameHeight ?? sh;
 			const offsetX = anim.frameOffsetX ?? this.config.frameOffsetX ?? 0;
 			const startCol = anim.startColumn ?? 0;
-			const sx = (startCol + this.spriteIndex) * cellW + offsetX;
-			const sy = anim.row * cellH;
+			const sx = (startCol + this.spriteIndex) * sw + offsetX;
+			const sy = anim.row * sh;
 			return { image, sx, sy, sw, sh };
 		}
 
