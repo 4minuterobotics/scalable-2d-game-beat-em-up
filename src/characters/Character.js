@@ -128,10 +128,22 @@ export default class Character {
 		const info = this.animator.getDrawInfo(this.direction);
 		if (!info || !info.image) return;
 		const sx = this.x - camera.x * this.parallax;
-		ctx.drawImage(info.image, info.sx, info.sy, info.sw, info.sh, sx, this.y, this.width, this.height);
-		const overlay = this.animator.getHitOverlayInfo(this.direction);
-		if (overlay) {
-			ctx.drawImage(overlay.image, overlay.sx, overlay.sy, overlay.sw, overlay.sh, sx, this.y, this.width, this.height);
+		if (info.flip) {
+			ctx.save();
+			ctx.translate(sx + this.width, this.y);
+			ctx.scale(-1, 1);
+			ctx.drawImage(info.image, info.sx, info.sy, info.sw, info.sh, 0, 0, this.width, this.height);
+			const overlay = this.animator.getHitOverlayInfo(this.direction);
+			if (overlay) {
+				ctx.drawImage(overlay.image, overlay.sx, overlay.sy, overlay.sw, overlay.sh, 0, 0, this.width, this.height);
+			}
+			ctx.restore();
+		} else {
+			ctx.drawImage(info.image, info.sx, info.sy, info.sw, info.sh, sx, this.y, this.width, this.height);
+			const overlay = this.animator.getHitOverlayInfo(this.direction);
+			if (overlay) {
+				ctx.drawImage(overlay.image, overlay.sx, overlay.sy, overlay.sw, overlay.sh, sx, this.y, this.width, this.height);
+			}
 		}
 	}
 }

@@ -21,6 +21,12 @@ Reverse-chronological log of notable changes. Kept current as part of each work 
 - Per-row **×** button removes a slot.
 - Renders slots in a compact grid with the slot name in monospace.
 
+### Runtime — canvas-flip for left-facing multi-row sheets
+- When an animation uses the per-anim `sheet`+`row`+`startColumn` format, the Animator now always reads from the right-facing sheet and returns a `flip: true` flag when direction is left. `Character.draw` honors the flag with `ctx.scale(-1, 1)` so the character draws mirrored without needing a separate mirrored sheet or fragile column-index math.
+- Fixes the soldier disappearing when moving left (previously the mirrored sheet's col 0 mapped to the right-most column of the original, which was empty for an 8-frame run cycle).
+- Hit-sprite overlays also flip along with the base when in flip mode.
+- Legacy strip images (venom / neil) still use their hand-authored `mirroredImage` — no behavior change there.
+
 ### Difficulty system (Task 6)
 - New top-level `game.difficulty` (integer, default 1). Exposed from `loadGame` to runtime and editors.
 - Per-wave `countPerDifficulty` and `countJitter` in stage JSON. Actual spawn count: `count + countPerDifficulty * (difficulty - 1) + randInt(0..countJitter)`. Rounded and clamped ≥ 0.

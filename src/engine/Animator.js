@@ -59,10 +59,12 @@ export default class Animator {
 		const anim = this.config.animations[this.current];
 		if (!anim) return null;
 
-		// Per-animation sheet (editor format): anim.sheet + row + startColumn
+		// Per-animation sheet (editor format): anim.sheet + row + startColumn.
+		// Always read from the right-facing sheet; caller flips on the canvas
+		// when direction === 'left'. Avoids fragile mirrored-sheet column math.
 		if (anim.sheet && anim.row != null) {
 			const sheet = anim.sheet;
-			const image = direction === 'left' ? anim.mirroredImage ?? anim.image ?? sheet.image : anim.image ?? sheet.image;
+			const image = anim.image ?? sheet.image;
 			if (!image) return null;
 			const sw = anim.frameWidth ?? this.config.frameWidth ?? sheet.frameWidth;
 			const sh = anim.frameHeight ?? this.config.frameHeight ?? sheet.frameHeight;
@@ -70,7 +72,7 @@ export default class Animator {
 			const startCol = anim.startColumn ?? 0;
 			const sx = (startCol + this.spriteIndex) * sw + offsetX;
 			const sy = anim.row * sh;
-			return { image, sx, sy, sw, sh };
+			return { image, sx, sy, sw, sh, flip: direction === 'left' };
 		}
 
 		const sw = anim.frameWidth ?? this.config.frameWidth;

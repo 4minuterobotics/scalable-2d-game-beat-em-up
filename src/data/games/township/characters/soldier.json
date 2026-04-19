@@ -34,7 +34,9 @@
         "pixelWidth": 2432,
         "pixelHeight": 1280
       },
-      "footsteps": []
+      "footsteps": [],
+      "isCollision": false,
+      "isProjectile": false
     },
     "shootHigh": {
       "image": "img/scalableCharacters/Soldier_1_Spritelist.png",
@@ -53,7 +55,9 @@
         "pixelWidth": 2432,
         "pixelHeight": 1280
       },
-      "footsteps": []
+      "footsteps": [],
+      "isCollision": false,
+      "isProjectile": false
     },
     "right": {
       "image": "img/scalableCharacters/Soldier_1_Spritelist.png",
@@ -75,7 +79,9 @@
       "footsteps": [
         3,
         6
-      ]
+      ],
+      "isCollision": false,
+      "isProjectile": false
     },
     "run": {
       "rate": 5,
@@ -97,7 +103,9 @@
       "footsteps": [
         3,
         6
-      ]
+      ],
+      "isCollision": false,
+      "isProjectile": false
     },
     "runRight": {
       "rate": 5,
@@ -119,7 +127,9 @@
       "footsteps": [
         3,
         6
-      ]
+      ],
+      "isCollision": false,
+      "isProjectile": false
     }
   },
   "inputActions": {},
