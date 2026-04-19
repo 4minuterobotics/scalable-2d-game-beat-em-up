@@ -40,7 +40,7 @@
     },
     "shootHigh": {
       "image": "img/scalableCharacters/Soldier_1_Spritelist.png",
-      "mirroredImage": "img/scalableCharacters/Soldier_1_Spritelist.png",
+      "mirroredImage": "img/scalableCharacters/Soldier_1_Spritelist_mirrored.png",
       "rate": 5,
       "loop": true,
       "row": 4,
@@ -130,9 +130,34 @@
       ],
       "isCollision": false,
       "isProjectile": false
+    },
+    "shootLow": {
+      "rate": 5,
+      "loop": true,
+      "image": "img/scalableCharacters/Soldier_1_Spritelist.png",
+      "mirroredImage": "img/scalableCharacters/Soldier_1_Spritelist_mirrored.png",
+      "row": 3,
+      "startColumn": 0,
+      "frames": 4,
+      "sheet": {
+        "image": "img/scalableCharacters/Soldier_1_Spritelist.png",
+        "columns": 19,
+        "rows": 10,
+        "frameWidth": 128,
+        "frameHeight": 128,
+        "pixelWidth": 2432,
+        "pixelHeight": 1280
+      },
+      "footsteps": [],
+      "isCollision": false,
+      "isProjectile": false
     }
   },
-  "inputActions": {},
+  "inputActions": {
+    "right": "right",
+    "runRight": "runRight",
+    "shootLow": "shootLow"
+  },
   "soundSlots": {
     "hurt": "hurt",
     "death": "death",

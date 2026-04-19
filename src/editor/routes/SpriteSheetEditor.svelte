@@ -536,8 +536,28 @@
 			cfg.animations[slotName] = existing
 				? { ...existing, ...sheetFields() }
 				: { rate: 5, loop: true, ...sheetFields() };
+
+			// Auto-wire: if the slot name matches a game action (excluding movement/
+			// modifier + the character's own locomotion slots), link it in inputActions.
+			let autoWired = false;
+			const excluded = new Set([
+				'right', 'left', 'up', 'down', 'sprint',
+				cfg.walkAnimation,
+				cfg.runAnimation,
+				cfg.startAnimation,
+				cfg.hurtAnimation,
+			].filter(Boolean));
+			const bindings = gameData?.game?.inputBindings ?? {};
+			if (bindings[slotName] && !excluded.has(slotName)) {
+				cfg.inputActions = cfg.inputActions ?? {};
+				if (cfg.inputActions[slotName] !== slotName) {
+					cfg.inputActions[slotName] = slotName;
+					autoWired = true;
+				}
+			}
+
 			await saveCharacter(slug, saveCharacterName, cfg);
-			status = `✓ Saved animation "${slotName}" to ${saveCharacterName}.`;
+			status = `✓ Saved animation "${slotName}" to ${saveCharacterName}${autoWired ? ` (auto-wired to the "${slotName}" key binding)` : ''}.`;
 			if (saveSlotMode === 'new') {
 				saveSlotMode = 'existing';
 				saveSlotExisting = slotName;

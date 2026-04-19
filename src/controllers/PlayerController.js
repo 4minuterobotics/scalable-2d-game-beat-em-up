@@ -25,5 +25,28 @@ export default class PlayerController {
 				}
 			}
 		}
+
+		// Auto-wire: if no explicit mapping matched, fire any animation whose name matches
+		// a held game action — unless that name is a movement/modifier or a locomotion/
+		// reaction slot the engine drives on its own.
+		if (!c.intent.action) {
+			const excluded = new Set([
+				'right', 'left', 'up', 'down', 'sprint',
+				c.config.walkAnimation,
+				c.config.runAnimation,
+				c.config.startAnimation,
+				c.config.hurtAnimation,
+			].filter(Boolean));
+			const bindings = this.input.bindings ?? {};
+			for (const action of Object.keys(bindings)) {
+				if (excluded.has(action)) continue;
+				if (!c.config.animations?.[action]) continue;
+				const explicit = c.config.inputActions?.[action];
+				if (explicit === '' || explicit === null) continue; // user explicitly cleared
+				if (!this.input.isDown(action)) continue;
+				c.intent.action = action;
+				break;
+			}
+		}
 	}
 }

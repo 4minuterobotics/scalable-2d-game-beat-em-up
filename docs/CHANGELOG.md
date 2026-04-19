@@ -21,6 +21,11 @@ Reverse-chronological log of notable changes. Kept current as part of each work 
 - Per-row **×** button removes a slot.
 - Renders slots in a compact grid with the slot name in monospace.
 
+### Input → animation auto-wiring
+- **PlayerController** — when no explicit `inputActions` mapping exists for a held key, the engine now auto-fires any animation whose slot name matches the action. Excludes movement / modifier actions (`right`, `left`, `up`, `down`, `sprint`) and the character's own `walkAnimation` / `runAnimation` / `startAnimation` / `hurtAnimation` targets so locomotion slots aren't hijacked as button actions.
+- **SpriteSheetEditor** — saving an animation to a slot that matches a game action now also writes `inputActions[slot] = slot` on the character, subject to the same exclusions. Status line notes when auto-wiring happened.
+- Existing explicit `inputActions` entries remain authoritative; auto-wiring only fills gaps.
+
 ### Sprite sheet editor — guided slot picker
 - New-slot mode now shows a **dropdown of valid slot names** instead of freeform text. Options come from: game-level `inputBindings` actions + engine/system slots (`idle`, `takeDamage`, `die`, `death`) + character's configured `walkAnimation` / `runAnimation` / `startAnimation` / `hurtAnimation` slots. Slots already bound on the character are filtered out.
 - System slots are grouped first and marked `(system)` in the option text.
