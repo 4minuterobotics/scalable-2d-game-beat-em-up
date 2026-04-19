@@ -57,14 +57,6 @@
     "punchLow": [
       "h"
     ],
-    "runLeft": [
-      "shift",
-      "left"
-    ],
-    "runRight": [
-      "shift",
-      "right"
-    ],
     "sprint": [
       "shift"
     ]
