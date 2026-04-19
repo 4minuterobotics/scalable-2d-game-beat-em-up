@@ -202,6 +202,16 @@
 			<span>sprint speed multiplier</span>
 			<input type="number" step="0.1" min="1" bind:value={config.sprintSpeedMultiplier} placeholder="1.5" />
 		</label>
+
+		<label>
+			<span>hurt animation (on taking damage)</span>
+			<select bind:value={config.hurtAnimation}>
+				<option value={undefined}>(none — stay on current animation)</option>
+				{#each animationNames as anim}
+					<option value={anim}>{anim}</option>
+				{/each}
+			</select>
+		</label>
 	</section>
 
 	<hr />

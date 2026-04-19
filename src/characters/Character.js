@@ -121,7 +121,21 @@ export default class Character {
 		if (this.health <= 0) {
 			this.alive = false;
 			if (this.config.sounds?.death) this.config.sounds.death.play();
+			return;
 		}
+		this._playHurtAnimation();
+	}
+
+	_playHurtAnimation() {
+		if (this.isActing) return;
+		const animations = this.config.animations ?? {};
+		const slot = this.config.hurtAnimation ?? (animations.takeDamage ? 'takeDamage' : null);
+		if (!slot || !animations[slot]) return;
+		this.isActing = true;
+		this.currentActionName = slot;
+		this.vx = 0;
+		this.vy = 0;
+		this.animator.play(slot, { reset: true });
 	}
 
 	draw(ctx, camera) {

@@ -21,6 +21,12 @@ Reverse-chronological log of notable changes. Kept current as part of each work 
 - Per-row **×** button removes a slot.
 - Renders slots in a compact grid with the slot name in monospace.
 
+### Take-damage animation (Task 7)
+- `Character.takeDamage` now plays a hurt animation when the character has one configured. Resolution order: `config.hurtAnimation` if set, else the `takeDamage` slot if it exists, else skip (character stays in its current animation — matches the graceful-degradation requirement).
+- Locks `isActing = true` for the duration, so the character pauses movement while reacting. Releases automatically on the animation's `end` event via the existing `_onAnimEvent` handler — so the hurt animation must be non-looping with a `next` slot (e.g., `loop: false, next: "idle"`) to return to normal play.
+- If the character is already mid-attack (`isActing`), the hurt animation is skipped so attacks aren't interrupted.
+- **CharacterEditor** — new "hurt animation (on taking damage)" dropdown in the Stats section. Leave as `(none)` for characters without a hurt sprite yet.
+
 ### Runtime — canvas-flip for left-facing multi-row sheets
 - When an animation uses the per-anim `sheet`+`row`+`startColumn` format, the Animator now always reads from the right-facing sheet and returns a `flip: true` flag when direction is left. `Character.draw` honors the flag with `ctx.scale(-1, 1)` so the character draws mirrored without needing a separate mirrored sheet or fragile column-index math.
 - Fixes the soldier disappearing when moving left (previously the mirrored sheet's col 0 mapped to the right-most column of the original, which was empty for an 8-frame run cycle).
