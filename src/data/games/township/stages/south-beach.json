@@ -1,0 +1,74 @@
+{
+  "name": "South Beach",
+  "lengthTiles": 30,
+  "tileWidth": 1280,
+  "ending": {
+    "type": "music",
+    "tileCount": 5,
+    "durationMs": 4000,
+    "music": null,
+    "boss": null,
+    "cutscene": null
+  },
+  "layers": [
+    {
+      "id": "very-far",
+      "parallax": 0.05,
+      "drawOrder": 1,
+      "depth": "background",
+      "items": [
+        { "image": "img/bgItems/pink-clouds.png", "x": 0, "y": -40, "widthScale": 2, "heightScale": 2, "count": 15, "spacingScale": 2 }
+      ]
+    },
+    {
+      "id": "horizon",
+      "parallax": 0,
+      "drawOrder": 2,
+      "depth": "background",
+      "items": [
+        { "image": "img/bgItems/pink-miami-sun.png", "x": 0, "y": -60, "widthScale": 2, "heightScale": 2, "count": 1 }
+      ]
+    },
+    {
+      "id": "far",
+      "parallax": 0.09,
+      "drawOrder": 3,
+      "depth": "background",
+      "items": [
+        { "image": "img/bgItems/pink-evening-buildings.png", "x": 0, "y": -10, "widthScale": 2, "heightScale": 2, "count": 15, "spacingScale": 2 }
+      ]
+    },
+    {
+      "id": "close",
+      "parallax": 0.13,
+      "drawOrder": 4,
+      "depth": "background",
+      "items": [
+        { "image": "img/bgItems/palmtrees-and-grass.png", "x": 0, "y": -20, "widthScale": 2, "heightScale": 2, "count": 25, "spacingScale": 2 }
+      ]
+    },
+    {
+      "id": "bg-tiles",
+      "parallax": 0.66,
+      "drawOrder": 5,
+      "depth": "background",
+      "items": [
+        { "image": "img/stages/highway.png", "x": 0, "y": -380, "width": 1280, "height": 960, "count": 30, "spacing": 1280 }
+      ]
+    },
+    {
+      "id": "fg",
+      "parallax": 1,
+      "drawOrder": 10,
+      "depth": "foreground",
+      "items": [
+        { "image": "img/foregroundItems/palm-tree.png", "x": 10, "y": -200, "widthScale": 4, "heightScale": 4, "count": 60, "spacing": 3000 }
+      ]
+    }
+  ],
+  "enemies": [
+    { "character": "neil", "count": 3, "x": 700, "xJitter": 1000, "yMin": 176, "yMax": 376, "speed": 1, "health": 2 },
+    { "character": "neil", "count": 4, "x": 1700, "xJitter": 1000, "yMin": 176, "yMax": 376, "speed": 1, "health": 4 },
+    { "character": "neil", "count": 5, "x": 2700, "xJitter": 1000, "yMin": 176, "yMax": 376, "speed": 1, "health": 6 }
+  ]
+}

@@ -1,0 +1,109 @@
+{
+  "name": "soldier",
+  "kind": "player",
+  "draw": {
+    "width": 200,
+    "height": 200
+  },
+  "frameWidth": 128,
+  "frameHeight": 128,
+  "frameOffsetX": 0,
+  "speed": 5,
+  "health": 20,
+  "spriteCenterOffset": 0,
+  "startDirection": "right",
+  "startAnimation": "idle",
+  "walkAnimation": "right",
+  "runAnimation": "runRight",
+  "sprintSpeedMultiplier": 1.6,
+  "animations": {
+    "idle": {
+      "image": "img/scalableCharacters/Soldier_1_Spritelist.png",
+      "mirroredImage": "img/scalableCharacters/Soldier_1_Spritelist.png",
+      "rate": 5,
+      "loop": true,
+      "row": 0,
+      "startColumn": 0,
+      "frames": 7,
+      "sheet": {
+        "image": "img/scalableCharacters/Soldier_1_Spritelist.png",
+        "columns": 19,
+        "rows": 10,
+        "frameWidth": 128,
+        "frameHeight": 128,
+        "pixelWidth": 2432,
+        "pixelHeight": 1280
+      },
+      "footsteps": []
+    },
+    "shootHigh": {
+      "image": "img/scalableCharacters/Soldier_1_Spritelist.png",
+      "mirroredImage": "img/scalableCharacters/Soldier_1_Spritelist.png",
+      "rate": 5,
+      "loop": true,
+      "row": 4,
+      "startColumn": 0,
+      "frames": 4,
+      "sheet": {
+        "image": "img/scalableCharacters/Soldier_1_Spritelist.png",
+        "columns": 19,
+        "rows": 10,
+        "frameWidth": 128,
+        "frameHeight": 128,
+        "pixelWidth": 2432,
+        "pixelHeight": 1280
+      },
+      "footsteps": []
+    },
+    "right": {
+      "image": "img/scalableCharacters/Soldier_1_Spritelist.png",
+      "mirroredImage": "img/scalableCharacters/Soldier_1_Spritelist.png",
+      "rate": 5,
+      "loop": true,
+      "row": 1,
+      "startColumn": 0,
+      "frames": 7,
+      "sheet": {
+        "image": "img/scalableCharacters/Soldier_1_Spritelist.png",
+        "columns": 19,
+        "rows": 8,
+        "frameWidth": 128,
+        "frameHeight": 160,
+        "pixelWidth": 2432,
+        "pixelHeight": 1280
+      },
+      "footsteps": [
+        3,
+        6
+      ]
+    },
+    "run": {
+      "rate": 5,
+      "loop": true,
+      "image": "img/scalableCharacters/Soldier_1_Spritelist.png",
+      "mirroredImage": "img/scalableCharacters/Soldier_1_Spritelist_mirrored.png",
+      "row": 2,
+      "startColumn": 0,
+      "frames": 8,
+      "sheet": {
+        "image": "img/scalableCharacters/Soldier_1_Spritelist.png",
+        "columns": 19,
+        "rows": 10,
+        "frameWidth": 128,
+        "frameHeight": 128,
+        "pixelWidth": 2432,
+        "pixelHeight": 1280
+      },
+      "footsteps": [
+        3,
+        6
+      ]
+    }
+  },
+  "inputActions": {},
+  "soundSlots": {
+    "hurt": "hurt",
+    "death": "death",
+    "step": "step"
+  }
+}

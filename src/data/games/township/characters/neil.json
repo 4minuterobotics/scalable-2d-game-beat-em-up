@@ -1,0 +1,74 @@
+{
+  "name": "neil",
+  "kind": "enemy",
+  "draw": {
+    "width": 200,
+    "height": 200
+  },
+  "frameWidth": 200,
+  "frameHeight": 200,
+  "frameOffsetX": 20,
+  "speed": 5,
+  "health": 5,
+  "spriteCenterOffset": 30,
+  "startDirection": "left",
+  "startAnimation": "idle",
+  "animations": {
+    "idle": {
+      "image": "img/character-sprites/neil/idle-right-sprite.png",
+      "mirroredImage": "img/character-sprites/neil/idle-left-sprite.png",
+      "frames": 1,
+      "rate": 8,
+      "loop": true,
+      "isCollision": false,
+      "isProjectile": false
+    },
+    "run": {
+      "image": "img/character-sprites/neil/walk-right-sprite.png",
+      "mirroredImage": "img/character-sprites/neil/walk-left-sprite.png",
+      "frames": 4,
+      "rate": 8,
+      "loop": true,
+      "row": 0,
+      "startColumn": 0,
+      "sheet": {
+        "image": "img/character-sprites/neil/walk-right-sprite.png",
+        "columns": 4,
+        "rows": 1,
+        "frameWidth": 225,
+        "frameHeight": 200,
+        "pixelWidth": 900,
+        "pixelHeight": 200
+      },
+      "footsteps": [
+        1,
+        3
+      ],
+      "isCollision": false,
+      "isProjectile": false
+    }
+  },
+  "ai": {
+    "detectRange": 500,
+    "stop": {
+      "x": 100,
+      "y": 10
+    },
+    "stopJitter": {
+      "x": 40,
+      "y": 30
+    },
+    "speechChance": 0.003,
+    "speechLines": [
+      "wassup",
+      "wheresYourId"
+    ]
+  },
+  "soundSlots": {
+    "wassup": "wassup",
+    "wheresYourId": "wheresYourId",
+    "hurt": "hurt",
+    "death": "death",
+    "step": "step"
+  }
+}

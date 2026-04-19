@@ -1,0 +1,78 @@
+{
+  "slug": "township",
+  "title": "The Township",
+  "viewport": {
+    "width": 1024,
+    "height": 576
+  },
+  "bounds": {
+    "topY": 376,
+    "bottomY": 576
+  },
+  "playerStart": {
+    "x": 100,
+    "y": 176
+  },
+  "playerCharacter": "soldier",
+  "inputBindings": {
+    "right": [
+      "right"
+    ],
+    "left": [
+      "left"
+    ],
+    "up": [
+      "up"
+    ],
+    "down": [
+      "down"
+    ],
+    "attack1": [
+      "space"
+    ],
+    "attack2": [
+      "b"
+    ],
+    "attack3": [
+      "s"
+    ],
+    "jump": [
+      "j"
+    ],
+    "shootHigh": [
+      "t"
+    ],
+    "shootLow": [
+      "g"
+    ],
+    "kickHigh": [
+      "r"
+    ],
+    "kickLow": [
+      "f"
+    ],
+    "punchHigh": [
+      "y"
+    ],
+    "punchLow": [
+      "h"
+    ],
+    "runLeft": [
+      "shift",
+      "left"
+    ],
+    "runRight": [
+      "shift",
+      "right"
+    ],
+    "sprint": [
+      "shift"
+    ]
+  },
+  "stageOrder": [
+    "alien-spaceship",
+    "south-beach",
+    "tijuana",
+    "wrigleyville"
+  ]
+}

@@ -1,0 +1,48 @@
+{
+  "name": "Tijuana",
+  "lengthTiles": 30,
+  "tileWidth": 1400,
+  "ending": {
+    "type": "music",
+    "tileCount": 5,
+    "durationMs": 4000,
+    "music": null,
+    "boss": null,
+    "cutscene": null
+  },
+  "layers": [
+    {
+      "id": "far",
+      "parallax": 0.09,
+      "drawOrder": 1,
+      "depth": "background",
+      "items": [
+        { "image": "img/bgItems/smoggy-orange-very-far-bg.png", "x": 0, "y": -40, "widthScale": 2, "heightScale": 2, "count": 15, "spacingScale": 2 }
+      ]
+    },
+    {
+      "id": "close",
+      "parallax": 0.13,
+      "drawOrder": 2,
+      "depth": "background",
+      "items": [
+        { "image": "img/bgItems/smoggy-orange-far-bg.png", "x": 0, "y": -150, "widthScale": 2, "heightScale": 2, "count": 15, "spacingScale": 2 }
+      ]
+    },
+    {
+      "id": "bg-tiles",
+      "parallax": 0.66,
+      "drawOrder": 3,
+      "depth": "background",
+      "items": [
+        { "image": "img/stages/tijuana-stage.png", "x": 0, "y": -270, "widthScale": 2.8, "heightScale": 2.8, "count": 15, "spacingScale": 5.6 },
+        { "image": "img/stages/tijuana-empty.png", "xScale": 2.8, "y": -270, "widthScale": 2.8, "heightScale": 2.8, "count": 15, "spacingScale": 5.6 }
+      ]
+    }
+  ],
+  "enemies": [
+    { "character": "neil", "count": 3, "x": 2000, "xJitter": 1000, "yMin": 176, "yMax": 376, "speed": 1, "health": 2 },
+    { "character": "neil", "count": 4, "x": 4000, "xJitter": 1000, "yMin": 176, "yMax": 376, "speed": 1, "health": 4 },
+    { "character": "neil", "count": 5, "x": 6000, "xJitter": 1000, "yMin": 176, "yMax": 376, "speed": 1, "health": 6 }
+  ]
+}

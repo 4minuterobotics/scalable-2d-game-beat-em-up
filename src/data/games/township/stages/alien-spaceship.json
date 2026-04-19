@@ -1,0 +1,77 @@
+{
+  "name": "Alien Spaceship",
+  "lengthTiles": 30,
+  "tileWidth": 1200,
+  "ending": {
+    "type": "music",
+    "tileCount": 5,
+    "durationMs": 4000,
+    "music": null,
+    "boss": null,
+    "cutscene": null
+  },
+  "layers": [
+    {
+      "id": "bg-tiles",
+      "parallax": 0.66,
+      "drawOrder": 1,
+      "depth": "background",
+      "items": [
+        {
+          "image": "img/stages/bluePipes.png",
+          "x": 0,
+          "y": -320,
+          "width": 1200,
+          "height": 900,
+          "count": 30,
+          "spacing": 1200
+        }
+      ]
+    },
+    {
+      "id": "bg-items",
+      "parallax": 0.66,
+      "drawOrder": 2,
+      "depth": "background",
+      "items": [
+        {
+          "image": "img/bgItems/tank-1.png",
+          "x": 2700, "y": 0,
+          "widthScale": 3, "heightScale": 3,
+          "count": 10, "spacing": 2700
+        },
+        {
+          "image": "img/bgItems/tank-2.png",
+          "x": 1500, "y": 0,
+          "widthScale": 3, "heightScale": 3,
+          "count": 10, "spacing": 1500
+        },
+        {
+          "image": "img/bgItems/tank-3.png",
+          "x": 10000, "y": 0,
+          "widthScale": 3, "heightScale": 3,
+          "count": 10, "spacing": 10000
+        }
+      ]
+    },
+    {
+      "id": "fg",
+      "parallax": 1,
+      "drawOrder": 10,
+      "depth": "foreground",
+      "items": [
+        {
+          "image": "img/foregroundItems/support.png",
+          "x": 50, "y": 0,
+          "widthScale": 3, "heightScale": 3,
+          "count": 10, "spacing": 1200
+        }
+      ]
+    }
+  ],
+  "enemies": [
+    { "character": "neil", "count": 3, "x": 1000, "xJitter": 1000, "yMin": 176, "yMax": 376, "speed": 1, "health": 2 },
+    { "character": "neil", "count": 4, "x": 3000, "xJitter": 1000, "yMin": 176, "yMax": 376, "speed": 1, "health": 4 },
+    { "character": "neil", "count": 5, "x": 5000, "xJitter": 1000, "yMin": 176, "yMax": 376, "speed": 1, "health": 6 }
+  ]
+}

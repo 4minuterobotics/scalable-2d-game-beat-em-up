@@ -1,0 +1,45 @@
+{
+  "punch": {
+    "fileUrl": "sounds/punch.mp3"
+  },
+  "bite": {
+    "fileUrl": "sounds/bite.mp3"
+  },
+  "swipe": {
+    "fileUrl": "sounds/swipe-short.mp3"
+  },
+  "dragon": {
+    "fileUrl": "sounds/dragon.mp3"
+  },
+  "wetFart": {
+    "fileUrl": "sounds/wet-fart.mp3"
+  },
+  "step": {
+    "fileUrl": "sounds/wood-step.mp3"
+  },
+  "myVoice": {
+    "fileUrl": "sounds/my-voice.mp3"
+  },
+  "whip": {
+    "fileUrl": "sounds/whip.mp3"
+  },
+  "tap": {
+    "fileUrl": "sounds/tap.mp3"
+  },
+  "hurt": {
+    "fileUrl": "sounds/hurt.mp3"
+  },
+  "death": {
+    "fileUrl": "sounds/death.mp3",
+    "trim": {
+      "startMs": 185,
+      "endMs": 1493
+    }
+  },
+  "wassup": {
+    "fileUrl": "sounds/neil-wassup.mp3"
+  },
+  "wheresYourId": {
+    "fileUrl": "sounds/neil-wheres-your-id.mp3"
+  }
+}

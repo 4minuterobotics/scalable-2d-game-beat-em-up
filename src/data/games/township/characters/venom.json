@@ -1,0 +1,132 @@
+{
+  "name": "venom",
+  "kind": "player",
+  "draw": {
+    "width": 900,
+    "height": 300
+  },
+  "frameWidth": 900,
+  "frameHeight": 200,
+  "speed": 5,
+  "health": 20,
+  "spriteCenterOffset": 40,
+  "startDirection": "right",
+  "startAnimation": "start",
+  "animations": {
+    "start": {
+      "image": "img/start-sprite-sheet.png",
+      "mirroredImage": "img/start-sprite-sheet.png",
+      "frames": 20,
+      "rate": 5,
+      "loop": false,
+      "next": "idle"
+    },
+    "idle": {
+      "image": "img/idle-right-spritesheet.png",
+      "mirroredImage": "img/idle-left-spritesheet.png",
+      "frames": 13,
+      "rate": 5,
+      "loop": true
+    },
+    "run": {
+      "image": "img/walk-right-sprite.png",
+      "mirroredImage": "img/walk-left-sprite.png",
+      "frames": 10,
+      "rate": 5,
+      "loop": true,
+      "footsteps": [
+        0,
+        5
+      ]
+    },
+    "punch": {
+      "image": "img/punch-right-spritesheet.png",
+      "mirroredImage": "img/punch-left-spritesheet.png",
+      "frames": 3,
+      "rate": 5,
+      "loop": false,
+      "next": "idle",
+      "attack": {
+        "width": 200,
+        "height": 40,
+        "damage": 1,
+        "hitFrame": 1,
+        "frames": 3,
+        "hitSprite": {
+          "image": "img/character-sprites/venom/punch-right-spritesheet-contact.png",
+          "mirroredImage": "img/character-sprites/venom/punch-left-spritesheet-contact.png"
+        },
+        "sounds": {
+          "start": "punch",
+          "startVoice": "myVoice",
+          "hit": "tap"
+        }
+      }
+    },
+    "bite": {
+      "image": "img/bite-right-spritesheet.png",
+      "mirroredImage": "img/bite-left-spritesheet.png",
+      "frames": 8,
+      "rate": 5,
+      "loop": false,
+      "next": "idle",
+      "attack": {
+        "width": 300,
+        "height": 40,
+        "damage": 3,
+        "hitFrame": 4,
+        "frames": 8,
+        "hitSprite": {
+          "image": "img/character-sprites/venom/bite-right-spritesheet-contact.png",
+          "mirroredImage": "img/character-sprites/venom/bite-left-spritesheet-contact.png"
+        },
+        "sounds": {
+          "start": "dragon",
+          "hit": "bite"
+        }
+      }
+    },
+    "swipe": {
+      "image": "img/swipe-right-spritesheet.png",
+      "mirroredImage": "img/swipe-left-spritesheet.png",
+      "frames": 7,
+      "rate": 5,
+      "loop": false,
+      "next": "idle",
+      "attack": {
+        "width": 150,
+        "height": 40,
+        "damage": 2,
+        "hitFrame": 3,
+        "frames": 7,
+        "hitSprite": {
+          "image": "img/character-sprites/venom/swipe-right-spritesheet-contact.png",
+          "mirroredImage": "img/character-sprites/venom/swipe-left-spritesheet-contact.png"
+        },
+        "sounds": {
+          "start": "swipe",
+          "startVoice": "wetFart",
+          "hit": "whip"
+        }
+      }
+    }
+  },
+  "inputActions": {
+    "attack1": "punch",
+    "attack2": "bite",
+    "attack3": "swipe"
+  },
+  "soundSlots": {
+    "punch": "punch",
+    "bite": "bite",
+    "swipe": "swipe",
+    "dragon": "dragon",
+    "wetFart": "wetFart",
+    "step": "step",
+    "myVoice": "myVoice",
+    "whip": "whip",
+    "tap": "tap",
+    "hurt": "hurt",
+    "death": "death"
+  }
+}

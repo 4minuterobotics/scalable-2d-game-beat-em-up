@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+		<meta charset="UTF-8" />
+		<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+		<title>Township Editor</title>
+		<style>
+			:root {
+				color-scheme: dark;
+				--fg: #4dff4d;
+				--fg-dim: #2a4d2a;
+				--bg: #05100a;
+				--bg-panel: #0a1f0a;
+				--border: #4dff4d;
+			}
+			* {
+				box-sizing: border-box;
+			}
+			body {
+				margin: 0;
+				padding: 0;
+				background: var(--bg);
+				color: var(--fg);
+				font-family: 'SF Mono', Menlo, Consolas, monospace;
+				font-size: 14px;
+				line-height: 1.5;
+				min-height: 100vh;
+			}
+			a {
+				color: var(--fg);
+			}
+			a:hover {
+				text-decoration: underline;
+			}
+			button {
+				background: var(--bg-panel);
+				color: var(--fg);
+				border: 1px solid var(--border);
+				padding: 6px 12px;
+				cursor: pointer;
+				font-family: inherit;
+				font-size: inherit;
+			}
+			button:hover {
+				background: var(--fg);
+				color: var(--bg);
+			}
+			input,
+			textarea,
+			select {
+				background: var(--bg);
+				color: var(--fg);
+				border: 1px solid var(--border);
+				padding: 6px 8px;
+				font-family: inherit;
+				font-size: inherit;
+			}
+			h1,
+			h2,
+			h3 {
+				color: var(--fg);
+				margin-top: 0;
+			}
+			hr {
+				border: 0;
+				border-top: 1px solid var(--fg-dim);
+				margin: 16px 0;
+			}
+		</style>
+	</head>
+	<body>
+		<div id="app"></div>
+		<script type="module" src="/src/editor/main.js"></script>
+	</body>
+</html>
