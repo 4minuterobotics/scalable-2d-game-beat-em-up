@@ -412,6 +412,66 @@
 		return !!cfg?.soundSlots?.step;
 	});
 
+	// System slots that aren't button-triggered but the engine/character still uses.
+	const SYSTEM_SLOTS = ['idle', 'takeDamage', 'die', 'death'];
+
+	const availableNewSlots = $derived.by(() => {
+		if (!gameData) return [];
+		const cfg = gameData.characters[saveCharacterName];
+		const taken = new Set(cfg?.animations ? Object.keys(cfg.animations) : []);
+		const fromBindings = Object.keys(gameData.game.inputBindings ?? {});
+		const fromCharacter = [
+			cfg?.walkAnimation,
+			cfg?.runAnimation,
+			cfg?.startAnimation,
+			cfg?.hurtAnimation,
+		].filter(Boolean);
+		const all = new Set([...fromBindings, ...SYSTEM_SLOTS, ...fromCharacter]);
+		return [...all]
+			.filter((name) => !taken.has(name))
+			.sort((a, b) => {
+				// Put system slots first, then game actions, alphabetical within each.
+				const aSys = SYSTEM_SLOTS.includes(a);
+				const bSys = SYSTEM_SLOTS.includes(b);
+				if (aSys !== bSys) return aSys ? -1 : 1;
+				return a.localeCompare(b);
+			})
+			.map((name) => ({ name, kind: SYSTEM_SLOTS.includes(name) ? 'system' : 'action' }));
+	});
+
+	async function quickAddBinding() {
+		const rawName = prompt('New game action name (e.g., dash, block, slide):');
+		if (!rawName) return;
+		const actionName = rawName.trim();
+		if (!/^[a-zA-Z][a-zA-Z0-9_-]*$/.test(actionName)) {
+			alert('Action name must start with a letter and contain only letters, numbers, _ or -.');
+			return;
+		}
+		if (gameData.game.inputBindings?.[actionName]) {
+			alert(`Action "${actionName}" already exists.`);
+			return;
+		}
+		const rawKey = prompt(`Key to bind to "${actionName}" (single letter, "space", or an arrow name like "right"):`);
+		if (!rawKey) return;
+		const key = rawKey.trim().toLowerCase();
+		try {
+			const res = await fetch(`/src/data/games/${slug}/game.json`);
+			if (!res.ok) throw new Error(`${res.status} fetching game.json`);
+			const cfg = await res.json();
+			cfg.inputBindings = cfg.inputBindings ?? {};
+			cfg.inputBindings[actionName] = [key];
+			await fetch('/_dev/save-game', {
+				method: 'POST',
+				headers: { 'Content-Type': 'application/json' },
+				body: JSON.stringify({ gameSlug: slug, config: cfg }),
+			});
+			status = `✓ Added action "${actionName}" bound to "${key}". Reloading…`;
+			setTimeout(() => window.location.reload(), 400);
+		} catch (err) {
+			status = `Failed to add binding: ${err.message}`;
+		}
+	}
+
 	const selectedSlotInfo = $derived(
 		existingSlots.find((s) => s.name === saveSlotExisting) ?? null
 	);
@@ -659,9 +719,17 @@
 							</label>
 						{:else}
 							<label>
-								<span>new name</span>
-								<input type="text" bind:value={saveSlotNew} placeholder="e.g. run" disabled={saving} />
+								<span>new slot</span>
+								<select bind:value={saveSlotNew} disabled={saving}>
+									<option value="">— pick —</option>
+									{#each availableNewSlots as opt}
+										<option value={opt.name}>
+											{opt.name}{opt.kind === 'system' ? ' (system)' : ''}
+										</option>
+									{/each}
+								</select>
 							</label>
+							<button class="inline" onclick={quickAddBinding} disabled={saving} title="Add a new game action + key binding">+ binding</button>
 						{/if}
 						<button onclick={saveSpecToCharacter} disabled={saving || !spec || spec.error}>
 							{saving ? 'Saving…' : 'Save'}

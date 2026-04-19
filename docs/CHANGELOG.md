@@ -21,6 +21,11 @@ Reverse-chronological log of notable changes. Kept current as part of each work 
 - Per-row **×** button removes a slot.
 - Renders slots in a compact grid with the slot name in monospace.
 
+### Sprite sheet editor — guided slot picker
+- New-slot mode now shows a **dropdown of valid slot names** instead of freeform text. Options come from: game-level `inputBindings` actions + engine/system slots (`idle`, `takeDamage`, `die`, `death`) + character's configured `walkAnimation` / `runAnimation` / `startAnimation` / `hurtAnimation` slots. Slots already bound on the character are filtered out.
+- System slots are grouped first and marked `(system)` in the option text.
+- **+ binding** button next to the dropdown prompts for a new action name + key and writes it straight into `game.inputBindings` via `/_dev/save-game`. Reloads the page so the new action appears in the dropdown immediately.
+
 ### Take-damage animation (Task 7)
 - `Character.takeDamage` now plays a hurt animation when the character has one configured. Resolution order: `config.hurtAnimation` if set, else the `takeDamage` slot if it exists, else skip (character stays in its current animation — matches the graceful-degradation requirement).
 - Locks `isActing = true` for the duration, so the character pauses movement while reacting. Releases automatically on the animation's `end` event via the existing `_onAnimEvent` handler — so the hurt animation must be non-looping with a `next` slot (e.g., `loop: false, next: "idle"`) to return to normal play.
