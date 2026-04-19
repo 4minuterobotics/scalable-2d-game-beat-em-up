@@ -21,6 +21,13 @@ Reverse-chronological log of notable changes. Kept current as part of each work 
 - Per-row **×** button removes a slot.
 - Renders slots in a compact grid with the slot name in monospace.
 
+### Sprite sheet editor — projectile + explosion ranges (Task 5)
+- Three separate selection ranges per save: **Main** (character animation, existing), **Projectile** (flying bullet/fireball frames, optional), **Explosion** (collision/impact frames, optional).
+- Tab bar above the hint lets the user switch which range is active. Clicks on the canvas apply to the active range. Each range draws with its own color: green (main), blue (projectile), orange (explosion).
+- Ranges serialize under the animation as `projectile: { row, startColumn, frames }` and `explosion: { row, startColumn, frames }` alongside the existing main fields. Omitted when unset.
+- Pre-populates projectile/explosion on load from an existing slot.
+- Summary line shows the frame count and row for each range. Shift+click footstep toggle remains scoped to the main range.
+
 ### Runtime — multi-row sheet support
 - `Animator.getDrawInfo` now understands the per-animation `sheet` + `row` + `startColumn` data that the sprite sheet editor saves. Previously the runtime only supported single-row strip images and hardcoded `sy: 0`, so animations authored against a multi-row grid (e.g., `img/scalableCharacters/Soldier_1_Spritelist.png` with 19 cols × 10 rows) drew from row 0 regardless of which slot was active, with stride `config.frameWidth` instead of the actual cell size.
 - New resolution order: (1) per-anim `sheet` + `row` (new editor output), (2) per-anim `image`/`mirroredImage` strip (venom legacy), (3) character-level `sheet` + per-anim `row` (older legacy). First match wins. Backward-compatible with all existing character JSON.

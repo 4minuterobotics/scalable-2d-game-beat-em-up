@@ -33,16 +33,21 @@
 	let canvas;
 	let selectionStart = $state(null);
 	let selectionEnd = $state(null);
+	let projectileStart = $state(null);
+	let projectileEnd = $state(null);
+	let explosionStart = $state(null);
+	let explosionEnd = $state(null);
+	let rangeMode = $state('main'); // 'main' | 'projectile' | 'explosion'
 	let status = $state('');
 	let uploading = $state(false);
 
 	const frameWidth = $derived(loaded && cols > 0 ? loaded.naturalWidth / cols : 0);
 	const frameHeight = $derived(loaded && rows > 0 ? loaded.naturalHeight / rows : 0);
 
-	const spec = $derived.by(() => {
-		if (selectionStart == null || selectionEnd == null) return null;
-		const a = Math.min(selectionStart, selectionEnd);
-		const b = Math.max(selectionStart, selectionEnd);
+	function specFrom(start, end) {
+		if (start == null || end == null) return null;
+		const a = Math.min(start, end);
+		const b = Math.max(start, end);
 		const rowA = Math.floor(a / cols);
 		const rowB = Math.floor(b / cols);
 		if (rowA !== rowB) return { error: 'Selection must stay within one row' };
@@ -51,12 +56,21 @@
 			startColumn: a % cols,
 			frames: b - a + 1,
 		};
-	});
+	}
+
+	const spec = $derived(specFrom(selectionStart, selectionEnd));
+	const projectileSpec = $derived(specFrom(projectileStart, projectileEnd));
+	const explosionSpec = $derived(specFrom(explosionStart, explosionEnd));
 
 	function pickImage(path) {
 		selected = path;
 		selectionStart = null;
 		selectionEnd = null;
+		projectileStart = null;
+		projectileEnd = null;
+		explosionStart = null;
+		explosionEnd = null;
+		rangeMode = 'main';
 		const img = new Image();
 		img.onload = () => {
 			loaded = img;
@@ -70,6 +84,10 @@
 		rows;
 		selectionStart;
 		selectionEnd;
+		projectileStart;
+		projectileEnd;
+		explosionStart;
+		explosionEnd;
 		footstepFrames;
 		if (loaded && canvas) draw();
 	});
@@ -85,18 +103,17 @@
 		const fw = loaded.naturalWidth / cols;
 		const fh = loaded.naturalHeight / rows;
 
-		// selection highlight
-		if (selectionStart != null) {
-			const a = selectionEnd == null ? selectionStart : Math.min(selectionStart, selectionEnd);
-			const b = selectionEnd == null ? selectionStart : Math.max(selectionStart, selectionEnd);
+		const drawRange = (start, end, color, errorColor, withFootsteps = false) => {
+			if (start == null) return;
+			const a = end == null ? start : Math.min(start, end);
+			const b = end == null ? start : Math.max(start, end);
 			const rowA = Math.floor(a / cols);
 			const rowB = Math.floor(b / cols);
-			ctx.fillStyle = 'rgba(77, 255, 77, 0.25)';
+			ctx.fillStyle = color;
 			if (rowA === rowB) {
 				const x = (a % cols) * fw;
 				ctx.fillRect(x, rowA * fh, fw * (b - a + 1), fh);
-				// footstep highlights (only valid when range is on a single row)
-				if (footstepFrames.size > 0) {
+				if (withFootsteps && footstepFrames.size > 0) {
 					ctx.fillStyle = 'rgba(255, 210, 77, 0.45)';
 					for (const idx of footstepFrames) {
 						const col = (a + idx) % cols;
@@ -115,10 +132,13 @@
 				ctx.fillRect(ax, rowA * fh, fw * cols - ax, fh);
 				for (let r = rowA + 1; r < rowB; r++) ctx.fillRect(0, r * fh, fw * cols, fh);
 				ctx.fillRect(0, rowB * fh, bx + fw, fh);
-				ctx.fillStyle = 'rgba(255, 120, 120, 0.25)';
+				ctx.fillStyle = errorColor;
 				ctx.fillRect(0, rowA * fh, canvas.width, (rowB - rowA + 1) * fh);
 			}
-		}
+		};
+		drawRange(selectionStart, selectionEnd, 'rgba(77, 255, 77, 0.25)', 'rgba(255, 120, 120, 0.25)', true);
+		drawRange(projectileStart, projectileEnd, 'rgba(77, 180, 255, 0.28)', 'rgba(255, 120, 120, 0.25)');
+		drawRange(explosionStart, explosionEnd, 'rgba(255, 120, 80, 0.32)', 'rgba(255, 120, 120, 0.25)');
 
 		// grid lines
 		ctx.strokeStyle = 'rgba(77, 255, 77, 0.9)';
@@ -166,7 +186,7 @@
 		const row = Math.min(rows - 1, Math.max(0, Math.floor(y / frameHeight)));
 		const idx = row * cols + col;
 
-		if (ev.shiftKey && spec && !spec.error) {
+		if (ev.shiftKey && rangeMode === 'main' && spec && !spec.error) {
 			const rangeStart = Math.min(selectionStart, selectionEnd);
 			const rangeEnd = Math.max(selectionStart, selectionEnd);
 			if (idx < rangeStart || idx > rangeEnd) return;
@@ -174,11 +194,37 @@
 			return;
 		}
 
-		if (selectionStart == null || (selectionStart != null && selectionEnd != null)) {
-			selectionStart = idx;
-			selectionEnd = null;
+		const setStart = (v) => {
+			if (rangeMode === 'projectile') projectileStart = v;
+			else if (rangeMode === 'explosion') explosionStart = v;
+			else selectionStart = v;
+		};
+		const setEnd = (v) => {
+			if (rangeMode === 'projectile') projectileEnd = v;
+			else if (rangeMode === 'explosion') explosionEnd = v;
+			else selectionEnd = v;
+		};
+		const start = rangeMode === 'projectile' ? projectileStart : rangeMode === 'explosion' ? explosionStart : selectionStart;
+		const end = rangeMode === 'projectile' ? projectileEnd : rangeMode === 'explosion' ? explosionEnd : selectionEnd;
+
+		if (start == null || (start != null && end != null)) {
+			setStart(idx);
+			setEnd(null);
 		} else {
-			selectionEnd = idx;
+			setEnd(idx);
+		}
+	}
+
+	function clearCurrentRange() {
+		if (rangeMode === 'projectile') {
+			projectileStart = null;
+			projectileEnd = null;
+		} else if (rangeMode === 'explosion') {
+			explosionStart = null;
+			explosionEnd = null;
+		} else {
+			selectionStart = null;
+			selectionEnd = null;
 		}
 	}
 
@@ -254,7 +300,7 @@
 
 	function sheetFields() {
 		const pair = imagePair ?? { image: selected, mirroredImage: selected };
-		return {
+		const fields = {
 			image: pair.image,
 			mirroredImage: pair.mirroredImage,
 			row: spec.row,
@@ -271,6 +317,21 @@
 			},
 			footsteps: [...footstepFrames].sort((a, b) => a - b),
 		};
+		if (projectileSpec && !projectileSpec.error) {
+			fields.projectile = {
+				row: projectileSpec.row,
+				startColumn: projectileSpec.startColumn,
+				frames: projectileSpec.frames,
+			};
+		}
+		if (explosionSpec && !explosionSpec.error) {
+			fields.explosion = {
+				row: explosionSpec.row,
+				startColumn: explosionSpec.startColumn,
+				frames: explosionSpec.frames,
+			};
+		}
+		return fields;
 	}
 
 	function buildAnimationBlock() {
@@ -297,12 +358,34 @@
 		if (saveSlotMode !== 'existing') return;
 		if (!selectedSlotInfo) {
 			footstepFrames = new Set();
+			projectileStart = null;
+			projectileEnd = null;
+			explosionStart = null;
+			explosionEnd = null;
 			return;
 		}
 		const cfg = gameData?.characters[saveCharacterName];
 		const anim = cfg?.animations?.[saveSlotExisting];
 		const existing = Array.isArray(anim?.footsteps) ? anim.footsteps : [];
 		footstepFrames = new Set(existing);
+		if (anim?.projectile && cols > 0) {
+			const p = anim.projectile;
+			const s = p.row * cols + p.startColumn;
+			projectileStart = s;
+			projectileEnd = s + (p.frames ?? 1) - 1;
+		} else {
+			projectileStart = null;
+			projectileEnd = null;
+		}
+		if (anim?.explosion && cols > 0) {
+			const e = anim.explosion;
+			const s = e.row * cols + e.startColumn;
+			explosionStart = s;
+			explosionEnd = s + (e.frames ?? 1) - 1;
+		} else {
+			explosionStart = null;
+			explosionEnd = null;
+		}
 	});
 
 	function basename(path) {
@@ -467,9 +550,38 @@
 				</label>
 			</div>
 
+			<div class="range-tabs">
+				<button
+					class="range-tab main"
+					class:active={rangeMode === 'main'}
+					onclick={() => (rangeMode = 'main')}
+				>Main (character)</button>
+				<button
+					class="range-tab projectile"
+					class:active={rangeMode === 'projectile'}
+					onclick={() => (rangeMode = 'projectile')}
+				>+ Projectile</button>
+				<button
+					class="range-tab explosion"
+					class:active={rangeMode === 'explosion'}
+					onclick={() => (rangeMode = 'explosion')}
+				>+ Explosion</button>
+				<span class="range-summary">
+					Main: {spec && !spec.error ? `${spec.frames}f @ r${spec.row}` : '—'}
+					· Proj: {projectileSpec && !projectileSpec.error ? `${projectileSpec.frames}f @ r${projectileSpec.row}` : '—'}
+					· Boom: {explosionSpec && !explosionSpec.error ? `${explosionSpec.frames}f @ r${explosionSpec.row}` : '—'}
+				</span>
+			</div>
+
 			<p class="hint">
-				Click two cells to select the frame range. <strong>Shift+click</strong> a cell inside the range to toggle it as a footstep (or use the F buttons below).
-				<button class="inline" onclick={clearSelection}>Clear</button>
+				{#if rangeMode === 'main'}
+					Click two cells to select the character animation range. <strong>Shift+click</strong> a cell inside the range to toggle it as a footstep (or use the F buttons below).
+				{:else if rangeMode === 'projectile'}
+					Click two cells to select the flying projectile frames (bullet, fireball, etc). Optional — skip if this animation isn't a projectile attack.
+				{:else}
+					Click two cells to select the impact/explosion frames that play when the projectile collides. Optional.
+				{/if}
+				<button class="inline" onclick={clearCurrentRange}>Clear this range</button>
 			</p>
 
 			<div class="canvas-wrap">
@@ -791,5 +903,41 @@
 	.warn-inline {
 		color: #ffd24d;
 		font-style: italic;
+	}
+	.range-tabs {
+		display: flex;
+		gap: 6px;
+		align-items: center;
+		flex-wrap: wrap;
+		margin: 4px 0 4px;
+	}
+	.range-tab {
+		padding: 4px 12px;
+		font-size: 12px;
+		background: transparent;
+		color: var(--fg);
+		border: 1px solid var(--fg-dim);
+		cursor: pointer;
+	}
+	.range-tab.active {
+		font-weight: bold;
+	}
+	.range-tab.main.active {
+		background: rgba(77, 255, 77, 0.3);
+		border-color: rgb(77, 255, 77);
+	}
+	.range-tab.projectile.active {
+		background: rgba(77, 180, 255, 0.3);
+		border-color: rgb(77, 180, 255);
+	}
+	.range-tab.explosion.active {
+		background: rgba(255, 120, 80, 0.3);
+		border-color: rgb(255, 120, 80);
+	}
+	.range-summary {
+		font-size: 11px;
+		opacity: 0.7;
+		margin-left: auto;
+		font-family: monospace;
 	}
 </style>
