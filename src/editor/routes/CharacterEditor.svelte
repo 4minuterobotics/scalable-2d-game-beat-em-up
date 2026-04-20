@@ -379,6 +379,55 @@
 						<button type="button" onclick={() => ensureAttack(animName)}>+ Add attack</button>
 					{/if}
 				</div>
+
+				{#if anim.projectile}
+					<div class="attack-block">
+						<div class="attack-header">
+							<strong>Projectile tuning</strong>
+							<span class="summary-meta">
+								row {anim.projectile.row} · start {anim.projectile.startColumn} · {anim.projectile.frames}f
+							</span>
+						</div>
+						<div class="grid">
+							<label>
+								<span>spawn frame (of parent anim)</span>
+								<input type="number" min="0" step="1" bind:value={anim.projectile.spawnFrame} placeholder="0" />
+							</label>
+							<label>
+								<span>speed (px/frame)</span>
+								<input type="number" step="0.5" bind:value={anim.projectile.speed} placeholder="12" />
+							</label>
+							<label>
+								<span>damage</span>
+								<input type="number" step="1" bind:value={anim.projectile.damage} placeholder="1" />
+							</label>
+							<label>
+								<span>lifetime (frames)</span>
+								<input type="number" min="1" step="10" bind:value={anim.projectile.lifetime} placeholder="180" />
+							</label>
+							<label>
+								<span>spawn offset X (px from center)</span>
+								<input type="number" step="1" bind:value={anim.projectile.spawnOffsetX} placeholder="0" />
+							</label>
+							<label>
+								<span>spawn offset Y (px from center)</span>
+								<input type="number" step="1" bind:value={anim.projectile.spawnOffsetY} placeholder={`${-(anim.projectile.drawHeight ?? 32)}`} />
+							</label>
+							<label>
+								<span>draw width (px)</span>
+								<input type="number" min="1" step="1" bind:value={anim.projectile.drawWidth} placeholder={`${anim.sheet?.frameWidth ?? 64}`} />
+							</label>
+							<label>
+								<span>draw height (px)</span>
+								<input type="number" min="1" step="1" bind:value={anim.projectile.drawHeight} placeholder={`${anim.sheet?.frameHeight ?? 64}`} />
+							</label>
+							<label>
+								<span>animation rate (ticks/frame)</span>
+								<input type="number" min="1" step="1" bind:value={anim.projectile.rate} placeholder="4" />
+							</label>
+						</div>
+					</div>
+				{/if}
 			</div>
 		</details>
 	{/each}

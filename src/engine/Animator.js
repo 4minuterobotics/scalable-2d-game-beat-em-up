@@ -35,6 +35,10 @@ export default class Animator {
 			this._fire('attackHit', anim.attack);
 			this._firedEvents.add('attackHit');
 		}
+		if (anim.projectile && (anim.projectile.spawnFrame ?? 0) === this.spriteIndex && !this._firedEvents.has('projectileSpawn')) {
+			this._fire('projectileSpawn', { anim });
+			this._firedEvents.add('projectileSpawn');
+		}
 
 		this.spriteIndex++;
 		if (this.spriteIndex >= anim.frames) {

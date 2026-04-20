@@ -22,6 +22,7 @@ export default class Character {
 		this.currentActionName = null;
 
 		this.onAttackHit = null;
+		this.onProjectileSpawn = null;
 
 		this.animator = new Animator(config);
 		this.animator.onEvent = (ev, data) => this._onAnimEvent(ev, data);
@@ -107,6 +108,9 @@ export default class Character {
 		}
 		if (ev === 'attackHit' && this.onAttackHit) {
 			this.onAttackHit(this.currentActionName, data);
+		}
+		if (ev === 'projectileSpawn' && this.onProjectileSpawn) {
+			this.onProjectileSpawn(this.currentActionName ?? this.animator.current, data);
 		}
 		if (ev === 'end' && this.isActing) {
 			this._endAction();

@@ -21,6 +21,16 @@ Reverse-chronological log of notable changes. Kept current as part of each work 
 - Per-row **×** button removes a slot.
 - Renders slots in a compact grid with the slot name in monospace.
 
+### Projectile runtime (Task 8)
+- New `Projectile` entity class ([src/game/Projectile.js](../src/game/Projectile.js)). Holds position, velocity, owner reference, damage, lifetime. Advances its own animation frames, runs AABB collisions, and transitions through `flying → exploding → done` states.
+- Animator fires a new `projectileSpawn` event when an animation's `spriteIndex` hits `anim.projectile.spawnFrame` (default 0). Dedup guard same as attackHit.
+- `Character` wires the event to `world._spawnProjectile(this, ...)`, which constructs a `Projectile` using the parent animation's sheet image + the projectile sub-range and queues it.
+- `World.update` now ticks projectiles and culls dead ones; `World.draw` sorts projectiles into the same z-sorted gameplay pass as characters so they render in the right depth order.
+- Projectile direction is inherited from the owner's facing; leftward projectiles are flipped on the canvas (same approach as left-facing characters).
+- On collision, projectiles trigger the animation's `explosion` sub-range at the hit position and apply `projectile.damage` to the target (falls back to `attack.damage` then 1). Explosion plays through once, then the projectile is removed.
+- Off-screen projectiles (beyond camera bounds ± 500 px) and projectiles older than `lifetime` (default 180 frames) clean up on their own.
+- **CharacterEditor** — when an animation has a `projectile` sub-range (from the Sprite Sheet Editor), a new "Projectile tuning" block exposes `spawnFrame`, `speed`, `damage`, `lifetime`, spawn offsets, draw dims, and animation rate.
+
 ### Hold-to-repeat actions (shoot, charge, etc.)
 - New animation flag `holdToRepeat: true`. While the bound key is held, the character plays the animation on loop; when the key is released, `isActing` clears and the character returns to its `next` slot (defaults to `idle`). Fixes the soldier getting locked into the shoot animation after pressing G.
 - PlayerController sets `intent.heldAction` each frame to the currently-held hold animation; if the character is already playing that action, we don't re-trigger it.
