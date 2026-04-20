@@ -31,13 +31,22 @@ export default class PlayerController {
 			c.config.hurtAnimation,
 		].filter(Boolean));
 
+		c.intent.heldAction = null;
 		if (c.config.inputActions) {
 			for (const [inputAction, animName] of Object.entries(c.config.inputActions)) {
 				if (MOVEMENT_RESERVED.has(inputAction)) continue;
 				if (LOCOMOTION_SLOTS.has(animName)) continue;
-				if (this.input.isDown(inputAction) && c.config.animations[animName]) {
+				const anim = c.config.animations[animName];
+				if (!anim) continue;
+				if (!this.input.isDown(inputAction)) continue;
+				if (anim.holdToRepeat) {
+					c.intent.heldAction = animName;
+					// Start the hold animation if not already on it
+					if (!c.isActing || c.currentActionName !== animName) {
+						c.intent.action = animName;
+					}
+				} else if (!c.intent.action) {
 					c.intent.action = animName;
-					break;
 				}
 			}
 		}

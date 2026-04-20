@@ -21,6 +21,12 @@ Reverse-chronological log of notable changes. Kept current as part of each work 
 - Per-row **×** button removes a slot.
 - Renders slots in a compact grid with the slot name in monospace.
 
+### Hold-to-repeat actions (shoot, charge, etc.)
+- New animation flag `holdToRepeat: true`. While the bound key is held, the character plays the animation on loop; when the key is released, `isActing` clears and the character returns to its `next` slot (defaults to `idle`). Fixes the soldier getting locked into the shoot animation after pressing G.
+- PlayerController sets `intent.heldAction` each frame to the currently-held hold animation; if the character is already playing that action, we don't re-trigger it.
+- CharacterEditor: new "hold to repeat" checkbox in each animation's body, next to `is projectile` / `is collision`.
+- Character can't move while a hold-to-repeat action is active (matches the design of a stationary shooting stance). Future enhancement: a per-animation `allowMovement` flag if you want to shoot while walking.
+
 ### Input-action guard, round 2 — locomotion target slots
 - PlayerController now also refuses to fire an `inputAction` whose **target animation** is a locomotion slot (`walkAnimation`, `runAnimation`, `startAnimation`, `hurtAnimation`). Matters when a binding has OR-style key lists like `runRight: [shift, right]`: pressing just `right` used to pass the `isDown('runRight')` check and lock the character in the looping run animation. The guard now stops the lock regardless of how the action was bound.
 - CharacterEditor's per-action animation dropdown filters out those same locomotion slots from the selectable options, so the mapping can't be re-created from the UI either.

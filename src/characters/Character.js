@@ -17,7 +17,7 @@ export default class Character {
 		this.alive = true;
 		this.parallax = 1;
 
-		this.intent = { moveX: 0, moveY: 0, action: null, sprint: false };
+		this.intent = { moveX: 0, moveY: 0, action: null, sprint: false, heldAction: null };
 		this.isActing = false;
 		this.currentActionName = null;
 
@@ -37,6 +37,14 @@ export default class Character {
 	}
 
 	update(world) {
+		// Release a hold-to-repeat action when its input is no longer held.
+		if (this.isActing) {
+			const currAnim = this.config.animations?.[this.currentActionName];
+			if (currAnim?.holdToRepeat && this.intent.heldAction !== this.currentActionName) {
+				this._endAction();
+			}
+		}
+
 		if (this.isActing) {
 			this.vx = 0;
 			this.vy = 0;
@@ -101,17 +109,21 @@ export default class Character {
 			this.onAttackHit(this.currentActionName, data);
 		}
 		if (ev === 'end' && this.isActing) {
-			this.isActing = false;
-			const finished = this.currentActionName;
-			this.currentActionName = null;
-			this.animator.useHitSprite = false;
-			const next = this.config.animations[finished]?.next ?? 'idle';
-			if (this.config.animations[next]) this.animator.play(next);
+			this._endAction();
 		}
 	}
 
 	showHitSprite(on) {
 		this.animator.useHitSprite = on;
+	}
+
+	_endAction() {
+		const finished = this.currentActionName;
+		this.isActing = false;
+		this.currentActionName = null;
+		this.animator.useHitSprite = false;
+		const next = this.config.animations[finished]?.next ?? 'idle';
+		if (this.config.animations[next]) this.animator.play(next);
 	}
 
 	takeDamage(amount) {

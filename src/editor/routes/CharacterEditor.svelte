@@ -288,6 +288,10 @@
 						/>
 					</label>
 					<label class="checkbox-row">
+						<input type="checkbox" bind:checked={anim.holdToRepeat} />
+						<span>hold to repeat (loop while key is held; release returns to idle)</span>
+					</label>
+					<label class="checkbox-row">
 						<input type="checkbox" bind:checked={anim.isProjectile} />
 						<span>is projectile</span>
 					</label>
