@@ -324,6 +324,21 @@ export default class TuningPanel {
 	_actionsSection() {
 		const children = [];
 
+		// Debug overlay toggle (dev-mode hitbox visualization)
+		const debugRow = document.createElement('label');
+		debugRow.style.cssText = 'display:flex; gap:8px; align-items:center; margin-bottom:8px;';
+		const debugCheckbox = document.createElement('input');
+		debugCheckbox.type = 'checkbox';
+		debugCheckbox.checked = !!this.world?.debugDraw;
+		debugCheckbox.addEventListener('change', (e) => {
+			if (this.world) this.world.debugDraw = e.target.checked;
+		});
+		const debugLabel = document.createElement('span');
+		debugLabel.textContent = 'Debug overlay (hitboxes, centers, bounds)';
+		debugRow.appendChild(debugCheckbox);
+		debugRow.appendChild(debugLabel);
+		children.push(debugRow);
+
 		if (this.onChangeDifficulty) {
 			const diffLabel = document.createElement('div');
 			diffLabel.style.cssText = SUBLABEL_STYLE;

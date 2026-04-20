@@ -22,6 +22,7 @@ export default class World {
 
 		this.onStageComplete = null;
 		this.onPlayerDead = null;
+		this.debugDraw = false;
 	}
 
 	setPlayer(character, controller) {
@@ -118,7 +119,107 @@ export default class World {
 		for (const layer of this.bgLayers) layer.draw(ctx, this.camera);
 		this._drawGameplay(ctx);
 		for (const layer of this.fgLayers) layer.draw(ctx, this.camera);
+		if (this.debugDraw) this._drawDebugOverlay(ctx);
 		if (this.playerHealthBar) this.playerHealthBar.draw(ctx);
+	}
+
+	_drawDebugOverlay(ctx) {
+		const all = [];
+		if (this.player) all.push({ char: this.player, role: 'player' });
+		for (const e of this.enemies) all.push({ char: e, role: 'enemy' });
+
+		ctx.save();
+		ctx.font = '10px monospace';
+		ctx.textBaseline = 'top';
+
+		for (const { char, role } of all) {
+			const sx = char.x - this.camera.x;
+
+			// Full draw box — cyan
+			ctx.strokeStyle = 'rgba(77, 210, 255, 0.85)';
+			ctx.lineWidth = 1.5;
+			ctx.strokeRect(sx + 0.5, char.y + 0.5, char.width - 1, char.height - 1);
+
+			// centerX — magenta vertical line (AI distance reference)
+			const cx = char.centerX - this.camera.x;
+			ctx.strokeStyle = 'rgba(255, 77, 210, 0.9)';
+			ctx.lineWidth = 2;
+			ctx.beginPath();
+			ctx.moveTo(cx, char.y);
+			ctx.lineTo(cx, char.y + char.height);
+			ctx.stroke();
+
+			// feetY — yellow horizontal line (ground plane)
+			ctx.strokeStyle = 'rgba(255, 220, 77, 0.9)';
+			ctx.lineWidth = 2;
+			ctx.beginPath();
+			ctx.moveTo(sx, char.feetY);
+			ctx.lineTo(sx + char.width, char.feetY);
+			ctx.stroke();
+
+			// Attack reach — red dashed (if mid-attack with a width/height)
+			const anim = char.config.animations?.[char.currentActionName];
+			const atk = anim?.attack;
+			if (char.isActing && atk?.width) {
+				const dir = char.direction === 'right' ? 1 : -1;
+				const rx = cx + (dir === 1 ? 0 : -atk.width);
+				const ry = char.feetY - (atk.height ?? 40) / 2 - 20;
+				ctx.strokeStyle = 'rgba(255, 90, 90, 0.9)';
+				ctx.lineWidth = 1.5;
+				ctx.setLineDash([4, 3]);
+				ctx.strokeRect(rx, ry, atk.width, atk.height ?? 40);
+				ctx.setLineDash([]);
+			}
+
+			// Label
+			ctx.fillStyle = role === 'player' ? 'rgba(77, 255, 77, 0.95)' : 'rgba(255, 210, 77, 0.95)';
+			const label = `${role}  w${char.width}×h${char.height}  off${char.spriteCenterOffset ?? 0}`;
+			ctx.fillText(label, sx + 2, char.y + 2);
+		}
+
+		// Projectile bounding boxes — orange
+		for (const p of this.projectiles) {
+			const psx = p.x - this.camera.x;
+			ctx.strokeStyle = 'rgba(255, 150, 77, 0.85)';
+			ctx.lineWidth = 1;
+			ctx.strokeRect(psx + 0.5, p.y + 0.5, p.width - 1, p.height - 1);
+		}
+
+		// Movement bounds (topY / bottomY feet plane) — dim white lines across the viewport
+		if (this.bounds) {
+			ctx.strokeStyle = 'rgba(255, 255, 255, 0.25)';
+			ctx.setLineDash([6, 6]);
+			ctx.beginPath();
+			ctx.moveTo(0, this.bounds.topY);
+			ctx.lineTo(this.viewportWidth, this.bounds.topY);
+			ctx.moveTo(0, this.bounds.bottomY);
+			ctx.lineTo(this.viewportWidth, this.bounds.bottomY);
+			ctx.stroke();
+			ctx.setLineDash([]);
+		}
+
+		// Legend (top-left of viewport)
+		const lx = 10;
+		let ly = 40;
+		const legend = [
+			['cyan', 'draw box (width × height)'],
+			['magenta', 'centerX (AI distance + camera anchor)'],
+			['yellow', 'feetY (ground plane / Y distance)'],
+			['red dashed', 'attack hitbox (during isActing)'],
+			['orange', 'projectile'],
+			['white dashed', 'movement bounds'],
+		];
+		ctx.fillStyle = 'rgba(0, 0, 0, 0.6)';
+		ctx.fillRect(lx - 4, ly - 4, 280, legend.length * 13 + 8);
+		ctx.fillStyle = 'white';
+		ctx.font = '10px monospace';
+		for (const [color, label] of legend) {
+			ctx.fillStyle = 'white';
+			ctx.fillText(`${color.padEnd(14)}${label}`, lx, ly);
+			ly += 13;
+		}
+
+		ctx.restore();
 	}
 
 	_drawGameplay(ctx) {

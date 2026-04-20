@@ -21,6 +21,17 @@ Reverse-chronological log of notable changes. Kept current as part of each work 
 - Per-row **×** button removes a slot.
 - Renders slots in a compact grid with the slot name in monospace.
 
+### Dev debug overlay
+- New **Debug overlay** checkbox at the top of the T-panel Actions section. When on, `World.draw` renders per-character and per-projectile outlines so the creator can see exactly where contact points are as they tune `draw.width/height`, `spriteCenterOffset`, `feetY`, attack `width/height`, etc.
+- Boxes drawn:
+  - Cyan outline — full draw rect (`x, y, width, height`).
+  - Magenta vertical line — `centerX` (AI distance reference, camera anchor).
+  - Yellow horizontal line — `feetY` (ground plane / AI Y reference).
+  - Red dashed — attack hitbox while `isActing` on an animation with an `attack` block.
+  - Orange outline — projectile boxes.
+  - White dashed — stage movement bounds (`topY` / `bottomY`).
+- On-screen legend in the top-left corner.
+
 ### Live preview sync (Task 9)
 - Dev endpoints now broadcast a `game-data-changed` event over Vite's WebSocket whenever `/_dev/save-character`, `/_dev/save-stage`, or `/_dev/save-game` writes a file. Payload includes `kind` and `gameSlug`.
 - The game tab (`canvas.js`) listens via `import.meta.hot.on` and reloads when the current game's data changes. 400 ms debounce so rapid saves (e.g., tuning-slider sweeps) don't cause reload storms.
