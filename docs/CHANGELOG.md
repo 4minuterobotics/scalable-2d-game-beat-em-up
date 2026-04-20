@@ -21,6 +21,11 @@ Reverse-chronological log of notable changes. Kept current as part of each work 
 - Per-row **×** button removes a slot.
 - Renders slots in a compact grid with the slot name in monospace.
 
+### Live preview sync (Task 9)
+- Dev endpoints now broadcast a `game-data-changed` event over Vite's WebSocket whenever `/_dev/save-character`, `/_dev/save-stage`, or `/_dev/save-game` writes a file. Payload includes `kind` and `gameSlug`.
+- The game tab (`canvas.js`) listens via `import.meta.hot.on` and reloads when the current game's data changes. 400 ms debounce so rapid saves (e.g., tuning-slider sweeps) don't cause reload storms.
+- Stage index is persisted to `sessionStorage` before each stage transition / T-panel stage pick, so the auto-reload lands on the stage the user was playing — not back at stage 0. Changing the in-game player character via the T panel also preserves stage position across reloads.
+
 ### Projectile runtime (Task 8)
 - New `Projectile` entity class ([src/game/Projectile.js](../src/game/Projectile.js)). Holds position, velocity, owner reference, damage, lifetime. Advances its own animation frames, runs AABB collisions, and transitions through `flying → exploding → done` states.
 - Animator fires a new `projectileSpawn` event when an animation's `spriteIndex` hits `anim.projectile.spawnFrame` (default 0). Dedup guard same as attackHit.

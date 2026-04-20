@@ -8,13 +8,40 @@ import loadGame from './src/engine/loadGame.js';
 
 const GAME_SLUG = 'township';
 
+if (import.meta.hot) {
+	let reloadTimer = null;
+	import.meta.hot.on('game-data-changed', (payload) => {
+		if (payload?.gameSlug && payload.gameSlug !== GAME_SLUG) return;
+		if (reloadTimer) clearTimeout(reloadTimer);
+		reloadTimer = setTimeout(() => {
+			console.log('[dev] Game data changed — reloading', payload);
+			location.reload();
+		}, 400);
+	});
+}
+
 const canvas = document.querySelector('canvas');
 let input = null;
 let joystick = null;
 let currentGame = null;
 let tuningPanel = null;
-let stageIndex = 0;
+let stageIndex = (() => {
+	try {
+		const saved = sessionStorage.getItem('__stageIndex');
+		return saved != null ? Math.max(0, parseInt(saved, 10) || 0) : 0;
+	} catch {
+		return 0;
+	}
+})();
 let startStage = null;
+
+function persistStageIndex() {
+	try {
+		sessionStorage.setItem('__stageIndex', String(stageIndex));
+	} catch {
+		/* ignore */
+	}
+}
 
 function isMobile() {
 	return window.innerWidth <= 800;
@@ -61,6 +88,7 @@ async function main() {
 			if (world._transitioning) return;
 			world._transitioning = true;
 			stageIndex = (stageIndex + 1) % game.stageOrder.length;
+			persistStageIndex();
 			startStage(stageIndex);
 		};
 		world.onPlayerDead = () => {
@@ -93,6 +121,7 @@ async function main() {
 				stages: game.stageOrder,
 				onSelectStage: (index) => {
 					stageIndex = index;
+					persistStageIndex();
 					startStage(index);
 				},
 				characters: Object.keys(game.characters),

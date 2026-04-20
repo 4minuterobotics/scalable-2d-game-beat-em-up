@@ -28,7 +28,16 @@ async function readJson(req) {
 async function writeEntityJson(server, gameSlug, folder, name, config) {
 	const path = resolve(server.config.root, 'src/data/games', gameSlug, folder, `${name}.json`);
 	await writeFile(path, JSON.stringify(config, null, 2) + '\n');
+	broadcastChange(server, { kind: folder, gameSlug, name });
 	return path;
+}
+
+function broadcastChange(server, payload) {
+	try {
+		server.ws.send('game-data-changed', payload);
+	} catch {
+		/* ws not ready — ignore */
+	}
 }
 
 function devEditorEndpoints() {
@@ -226,6 +235,7 @@ function devEditorEndpoints() {
 					}
 					const path = resolve(server.config.root, 'src/data/games', gameSlug, 'game.json');
 					await writeFile(path, JSON.stringify(config, null, 2) + '\n');
+					broadcastChange(server, { kind: 'game', gameSlug });
 					res.setHeader('Content-Type', 'application/json');
 					res.end(JSON.stringify({ ok: true }));
 				} catch (err) {
