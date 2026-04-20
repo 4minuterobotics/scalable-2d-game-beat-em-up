@@ -6,6 +6,11 @@ export default class PlayerController {
 
 	update() {
 		const c = this.character;
+
+		// Always track held hold-to-repeat actions so Character.update can detect
+		// release even while isActing=true.
+		c.intent.heldAction = this._findHeldAction();
+
 		if (c.isActing) return;
 
 		const right = this.input.isDown('right') ? 1 : 0;
@@ -31,7 +36,6 @@ export default class PlayerController {
 			c.config.hurtAnimation,
 		].filter(Boolean));
 
-		c.intent.heldAction = null;
 		if (c.config.inputActions) {
 			for (const [inputAction, animName] of Object.entries(c.config.inputActions)) {
 				if (MOVEMENT_RESERVED.has(inputAction)) continue;
@@ -39,15 +43,10 @@ export default class PlayerController {
 				const anim = c.config.animations[animName];
 				if (!anim) continue;
 				if (!this.input.isDown(inputAction)) continue;
-				if (anim.holdToRepeat) {
-					c.intent.heldAction = animName;
-					// Start the hold animation if not already on it
-					if (!c.isActing || c.currentActionName !== animName) {
-						c.intent.action = animName;
-					}
-				} else if (!c.intent.action) {
+				if (!c.intent.action) {
 					c.intent.action = animName;
 				}
+				if (anim.holdToRepeat) break;
 			}
 		}
 
@@ -73,5 +72,16 @@ export default class PlayerController {
 				break;
 			}
 		}
+	}
+
+	_findHeldAction() {
+		const c = this.character;
+		const actions = c.config.inputActions ?? {};
+		for (const [inputAction, animName] of Object.entries(actions)) {
+			const anim = c.config.animations?.[animName];
+			if (!anim?.holdToRepeat) continue;
+			if (this.input.isDown(inputAction)) return animName;
+		}
+		return null;
 	}
 }
