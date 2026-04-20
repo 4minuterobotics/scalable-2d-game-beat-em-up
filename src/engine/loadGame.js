@@ -73,20 +73,13 @@ async function hydrateCharacter(json, soundMap) {
 		};
 	}
 	return {
-		name: json.name,
-		kind: json.kind,
-		frameWidth: json.frameWidth,
-		frameHeight: json.frameHeight,
+		...json,
 		frameOffsetX: json.frameOffsetX ?? 0,
-		draw: json.draw,
-		speed: json.speed,
-		health: json.health,
 		spriteCenterOffset: json.spriteCenterOffset ?? 0,
 		startDirection: json.startDirection ?? 'right',
 		startAnimation: json.startAnimation ?? 'idle',
 		animations,
 		inputActions: json.inputActions ?? {},
-		ai: json.ai,
 		sounds,
 		sheet,
 	};

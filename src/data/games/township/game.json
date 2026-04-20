@@ -39,12 +39,6 @@
     "jump": [
       "j"
     ],
-    "shootHigh": [
-      "t"
-    ],
-    "shootLow": [
-      "g"
-    ],
     "kickHigh": [
       "r"
     ],
@@ -59,6 +53,9 @@
     ],
     "sprint": [
       "shift"
+    ],
+    "shoot": [
+      "g"
     ]
   },
   "stageOrder": [
