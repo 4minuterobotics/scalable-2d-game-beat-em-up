@@ -182,6 +182,15 @@
 		</label>
 
 		<label>
+			<span>mirror mode (how left-facing draw is handled)</span>
+			<select bind:value={config.mirrorMode}>
+				<option value={undefined}>(default: canvas — flip the right-facing sheet)</option>
+				<option value="canvas">canvas — flip right-facing sheet on draw</option>
+				<option value="inPlace">inPlace — use a hand-authored mirroredImage at the same cell</option>
+			</select>
+		</label>
+
+		<label>
 			<span>start direction</span>
 			<select bind:value={config.startDirection}>
 				<option value="right">right</option>

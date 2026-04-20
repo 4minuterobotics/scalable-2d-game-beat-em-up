@@ -64,19 +64,26 @@ export default class Animator {
 		if (!anim) return null;
 
 		// Per-animation sheet (editor format): anim.sheet + row + startColumn.
-		// Always read from the right-facing sheet; caller flips on the canvas
-		// when direction === 'left'. Avoids fragile mirrored-sheet column math.
 		if (anim.sheet && anim.row != null) {
 			const sheet = anim.sheet;
-			const image = anim.image ?? sheet.image;
-			if (!image) return null;
+			const rightImage = anim.image ?? sheet.image;
+			if (!rightImage) return null;
 			const sw = anim.frameWidth ?? this.config.frameWidth ?? sheet.frameWidth;
 			const sh = anim.frameHeight ?? this.config.frameHeight ?? sheet.frameHeight;
 			const offsetX = anim.frameOffsetX ?? this.config.frameOffsetX ?? 0;
 			const startCol = anim.startColumn ?? 0;
 			const sx = (startCol + this.spriteIndex) * sw + offsetX;
 			const sy = anim.row * sh;
-			return { image, sx, sy, sw, sh, flip: direction === 'left' };
+
+			// mirrorMode: 'canvas' (default) always flips the right-facing sheet on
+			// the canvas. 'inPlace' uses a separate hand-authored mirroredImage at
+			// the same cell position — correct for neil/venom whose left-facing
+			// poses are drawn in-place. 'wholeFlip' reserved for future use.
+			const mirrorMode = anim.mirrorMode ?? this.config.mirrorMode ?? 'canvas';
+			if (direction === 'left' && anim.mirroredImage && anim.mirroredImage !== rightImage && mirrorMode === 'inPlace') {
+				return { image: anim.mirroredImage, sx, sy, sw, sh, flip: false };
+			}
+			return { image: rightImage, sx, sy, sw, sh, flip: direction === 'left' };
 		}
 
 		const sw = anim.frameWidth ?? this.config.frameWidth;

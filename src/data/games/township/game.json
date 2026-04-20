@@ -13,7 +13,7 @@
     "x": 100,
     "y": 176
   },
-  "playerCharacter": "soldier",
+  "playerCharacter": "neil",
   "inputBindings": {
     "right": [
       "right"

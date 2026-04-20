@@ -10,7 +10,7 @@
   "frameOffsetX": 20,
   "speed": 5,
   "health": 5,
-  "spriteCenterOffset": 30,
+  "spriteCenterOffset": -1,
   "startDirection": "left",
   "startAnimation": "idle",
   "animations": {
@@ -21,7 +21,8 @@
       "rate": 8,
       "loop": true,
       "isCollision": false,
-      "isProjectile": false
+      "isProjectile": false,
+      "holdToRepeat": false
     },
     "run": {
       "image": "img/character-sprites/neil/walk-right-sprite.png",
@@ -45,7 +46,8 @@
         3
       ],
       "isCollision": false,
-      "isProjectile": false
+      "isProjectile": false,
+      "holdToRepeat": false
     }
   },
   "ai": {
@@ -70,5 +72,7 @@
     "hurt": "hurt",
     "death": "death",
     "step": "step"
-  }
+  },
+  "mirrorCenterOffsetOnFlip": true,
+  "mirrorMode": "inPlace"
 }

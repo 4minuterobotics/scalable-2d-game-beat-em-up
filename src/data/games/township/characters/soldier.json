@@ -10,7 +10,7 @@
   "frameOffsetX": 0,
   "speed": 5,
   "health": 20,
-  "spriteCenterOffset": -2,
+  "spriteCenterOffset": -3,
   "startDirection": "right",
   "startAnimation": "idle",
   "walkAnimation": "right",
@@ -188,5 +188,6 @@
     "hurt": "hurt",
     "death": "death",
     "step": "step"
-  }
+  },
+  "mirrorCenterOffsetOnFlip": false
 }

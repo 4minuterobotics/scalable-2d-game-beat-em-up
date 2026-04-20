@@ -21,6 +21,13 @@ Reverse-chronological log of notable changes. Kept current as part of each work 
 - Per-row **×** button removes a slot.
 - Renders slots in a compact grid with the slot name in monospace.
 
+### mirrorMode config — opt back into hand-authored mirrored images
+- Previous commit forced all per-anim-sheet animations to canvas-flip on direction='left', which was correct for auto-generated whole-sheet flips (soldier) but broke neil's hand-authored `walk-left-sprite.png` (each pose in-place mirrored). When neil faced left, canvas-flipping his right-facing sheet shifted the body within the draw box — looked like "neil jumps further" when the player walked left.
+- New per-character (and optional per-animation) `mirrorMode`:
+  - `'canvas'` (default, backward-compat with recent behavior) — flip the right-facing sheet on the canvas.
+  - `'inPlace'` — use the hand-authored `mirroredImage` at the same grid cell with no flip. Correct for characters like neil whose mirrored file is an in-place per-frame mirror.
+- neil.json now sets `mirrorMode: "inPlace"`. CharacterEditor exposes a dropdown in the Stats section.
+
 ### Dev debug overlay
 - New **Debug overlay** checkbox at the top of the T-panel Actions section. When on, `World.draw` renders per-character and per-projectile outlines so the creator can see exactly where contact points are as they tune `draw.width/height`, `spriteCenterOffset`, `feetY`, attack `width/height`, etc.
 - Boxes drawn:
