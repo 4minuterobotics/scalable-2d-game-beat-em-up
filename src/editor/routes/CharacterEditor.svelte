@@ -176,6 +176,11 @@
 			<input type="number" step="1" bind:value={config.spriteCenterOffset} />
 		</label>
 
+		<label class="checkbox-row">
+			<input type="checkbox" bind:checked={config.mirrorCenterOffsetOnFlip} />
+			<span>mirror center offset when facing left (for characters using canvas-flip)</span>
+		</label>
+
 		<label>
 			<span>start direction</span>
 			<select bind:value={config.startDirection}>

@@ -30,7 +30,8 @@ export default class Character {
 	}
 
 	get centerX() {
-		return this.x + this.width / 2 + this.spriteCenterOffset;
+		const sign = this.config.mirrorCenterOffsetOnFlip && this.direction === 'left' ? -1 : 1;
+		return this.x + this.width / 2 + this.spriteCenterOffset * sign;
 	}
 
 	get feetY() {

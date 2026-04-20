@@ -2,15 +2,15 @@
   "name": "soldier",
   "kind": "player",
   "draw": {
-    "width": 200,
-    "height": 200
+    "width": 400,
+    "height": 399
   },
   "frameWidth": 128,
   "frameHeight": 128,
   "frameOffsetX": 0,
   "speed": 5,
   "health": 20,
-  "spriteCenterOffset": 0,
+  "spriteCenterOffset": -2,
   "startDirection": "right",
   "startAnimation": "idle",
   "walkAnimation": "right",
@@ -36,7 +36,8 @@
       },
       "footsteps": [],
       "isCollision": false,
-      "isProjectile": false
+      "isProjectile": false,
+      "holdToRepeat": false
     },
     "shootHigh": {
       "image": "img/scalableCharacters/Soldier_1_Spritelist.png",
@@ -57,7 +58,8 @@
       },
       "footsteps": [],
       "isCollision": false,
-      "isProjectile": false
+      "isProjectile": false,
+      "holdToRepeat": false
     },
     "right": {
       "image": "img/scalableCharacters/Soldier_1_Spritelist.png",
@@ -81,7 +83,8 @@
         6
       ],
       "isCollision": false,
-      "isProjectile": false
+      "isProjectile": false,
+      "holdToRepeat": false
     },
     "run": {
       "rate": 5,
@@ -105,7 +108,8 @@
         6
       ],
       "isCollision": false,
-      "isProjectile": false
+      "isProjectile": false,
+      "holdToRepeat": false
     },
     "runRight": {
       "rate": 5,
@@ -129,7 +133,8 @@
         6
       ],
       "isCollision": false,
-      "isProjectile": false
+      "isProjectile": false,
+      "holdToRepeat": false
     },
     "shootLow": {
       "rate": 5,
@@ -150,7 +155,8 @@
       },
       "footsteps": [],
       "isCollision": false,
-      "isProjectile": false
+      "isProjectile": false,
+      "holdToRepeat": false
     },
     "shoot": {
       "rate": 5,
@@ -170,7 +176,9 @@
         "pixelWidth": 2432,
         "pixelHeight": 1280
       },
-      "footsteps": []
+      "footsteps": [],
+      "isCollision": false,
+      "isProjectile": false
     }
   },
   "inputActions": {
